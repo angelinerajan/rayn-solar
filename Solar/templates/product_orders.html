@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order History | Rayn Solar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      /* MATCHED TO RAYN SOLAR SIGNATURE TONALITY */
+      --bg1: #300305;       /* Deep luxurious burgundy */
+      --bg2: #141824;       /* Twilight midnight blue */
+      --bg-mid: #0f111a;    /* Deep slate tone */
+      --card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6e8ee; 
+      --muted: #9aa0b4; 
+      --accent: #8b5cf6;     /* Vibrant purple signature accent */
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      --success-glow: rgba(34, 197, 94, 0.15);
+      --success-text: #4ade80;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      /* Smooth mixed dark multi-gradient matching user home */
+      background: 
+        radial-gradient(circle at top, var(--bg2), transparent 55%),
+        linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 100%);
+      background-attachment: scroll;
+      color: var(--text);
+      padding: 40px 20px;
+    }
+
+    .container { 
+      max-width: 1000px; 
+      margin: auto; 
+    }
+
+    /* Breadcrumb Component Parity */
+    .breadcrumb-wrapper {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .breadcrumb a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .breadcrumb a.home-link {
+      color: var(--accent);
+    }
+
+    .breadcrumb a:hover {
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .breadcrumb a.home-link:hover {
+      filter: brightness(1.2);
+      color: var(--accent);
+    }
+
+    .breadcrumb i.fa-chevron-right {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .breadcrumb span.current-page {
+      color: var(--muted);
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    h1 { 
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px; 
+    }
+
+    .order-card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .order-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: transparent;
+      transition: 0.3s;
+    }
+
+    .order-card:hover {
+      border-color: rgba(139, 92, 246, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateX(4px);
+    }
+
+    .order-card:hover::before {
+      background: var(--accent-gradient);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 14px;
+    }
+
+    .order-header strong {
+      color: #fff;
+      font-size: 1.15rem;
+    }
+
+    .status {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status.success { 
+      background: var(--success-glow); 
+      color: var(--success-text);
+      border: 1px solid rgba(74, 222, 128, 0.2);
+    }
+
+    .muted { 
+      color: var(--muted); 
+      font-size: 0.85rem; 
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .order-body {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    img {
+      width: 85px;
+      height: 85px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+
+    .order-info p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .order-info p strong {
+      color: #fff;
+    }
+
+    .empty-orders {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="breadcrumb-wrapper">
+    <nav class="breadcrumb">
+      <a href="/user_home/" class="home-link">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'product_marketplace' %}">Rayn Inventory</a>
+      <i class="fas fa-chevron-right"></i>
+      <span class="current-page">Order History</span>
+    </nav>
+  </div>
+
+  <h1>Your Orders</h1>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-card">
+
+        <div class="order-header">
+          <div>
+            <strong>{{ order.product.name }}</strong><br>
+            <span class="muted"><i class="far fa-calendar-alt"></i> {{ order.created_at|date:"M d, Y • H:i" }}</span>
+          </div>
+          <span class="status success">
+            <i class="fas fa-check-circle"></i> {{ order.payment_status }}
+          </span>
+        </div>
+
+        <div class="order-body">
+          {% if order.product.image %}
+            <img src="{{ order.product.image.url }}" alt="{{ order.product.name }}">
+          {% else %}
+            <div style="width: 85px; height: 85px; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+              <i class="fas fa-solar-panel" style="color: var(--border); font-size: 1.5rem;"></i>
+            </div>
+          {% endif %}
+
+          <div class="order-info">
+            <p>Quantity: <strong>{{ order.quantity }}</strong></p>
+            <p>Unit Price: <span>₹{{ order.price }}</span></p>
+            <p style="margin-top: 8px; font-size: 1.05rem;">Total Amount: <strong style="color: var(--accent);">₹{{ order.total_price }}</strong></p>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-orders">
+      <i class="fas fa-box-open fa-3x" style="color: var(--border); margin-bottom: 15px; display: block;"></i>
+      <p>No transactions found in your order account window.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Installation Request | Solar Services</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+ <style>
+    :root {
+      /* THEME REALIGNED TO MATCH RAYN SOLAR HOVER COLORS */
+      --bg1: #300305;       /* Deep luxurious burgundy */
+      --bg2: #141824;       /* Twilight midnight blue */
+      --bg-mid: #0f111a;    /* Deep slate tone to stabilize center values */
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --text: #e6e8ee;
+      --muted: #9aa0b4;
+      --accent: #8b5cf6;     /* Vibrant purple signature accent */
+      --accent2: #06b6d4;
+      --error: #f87171;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      padding: 30px;
+      /* Integrated the smooth mixed dark multi-gradient from your homepage */
+      background: 
+        radial-gradient(circle at top, var(--bg2), transparent 55%),
+        linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 100%);
+      background-attachment: scroll;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+      color: var(--muted);
+    }
+
+    .breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* --- Status Tracker Styles --- */
+    .status-section {
+      margin-bottom: 40px;
+    }
+
+    .status-card {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 25px;
+      border-left: 6px solid var(--accent2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .status-card.approved { border-left-color: var(--accent); }
+    .status-card.rejected { border-left-color: var(--error); }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* --- Form Styles --- */
+    .request-form-card {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 40px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+
+    h1, h2, h3 {
+      background: linear-gradient(135deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text; /* Standard version */
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(0,0,0,0.4);
+    }
+
+    input[readonly] {
+      background: rgba(255,255,255,0.01) !important;
+      color: var(--muted);
+    }
+
+    .info-box {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 25px;
+      color: var(--text);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: #ffffff;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+      filter: brightness(0.8);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.1);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="font-size: 1.5rem; color: var(--accent2);">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+                <p style="font-size: 0.9rem; color: var(--muted);">Investigation Date:</p>
+                <p style="font-weight: 600;">
+                    {% if existing_request.investigation_date %}
+                        {{ existing_request.investigation_date|date:"l, d M Y" }}
+                    {% else %}
+                        TBD (Waiting for Admin)
+                    {% endif %}
+                </p>
+            </div>
+        </div> -->
+
+  <div class="container">
+    <div class="breadcrumb" style="justify-content: space-between; width: 100%;">
+        <div>
+            <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/services/">Services</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Installation Request</span>
+        </div>
+        
+        <a href="{% url 'installation_history' %}" style="text-decoration: none; font-size: 0.85rem; color: var(--accent2); border: 1px solid var(--accent2); padding: 6px 14px; border-radius: 10px; transition: 0.3s;">
+            <i class="fas fa-history"></i> View Request History
+        </a>
+    </div>
+
+    <div class="request-form-card">
+        <h2>Request Professional Installation</h2>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 25px;">
+            Provide your details below. If you have a recent estimation, we've pre-filled the technical parts for you.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            
+        {% if last_est %}
+        <div class="info-box">
+          <i class="fas fa-info-circle"></i> 
+          We found an estimation for a <strong>{{ technical.system_size }}kW</strong> system from {{ last_est.created_at|date:"M d" }}.
+        </div>
+        {% endif %}
+
+<div class="form-group">
+  <label>Equipment Source</label>
+  <select name="equipment_source" id="sourceSelector" onchange="toggleEquipmentFields()">
+    <option value="estimation" {% if technical %}selected{% else %}disabled{% endif %}>Based on my last estimation</option>
+    <option value="external" {% if not technical %}selected{% endif %}>I have my own equipment (External)</option>
+  </select>
+</div>
+
+<div class="grid-2">
+  <div class="form-group">
+    <label>System Size (kW)</label>
+    <input type="number" step="0.1" name="system_size" id="sys_size" 
+           min="1" value="{{ technical.system_size|default:'' }}" 
+           {% if technical %}readonly{% endif %} required>
+  </div>
+  <div class="form-group">
+    <label>Approx. Number of Panels</label>
+    <input type="number" name="panels_count" id="panel_count" 
+           min="1" value="{{ technical.panels_needed|default:'' }}" 
+           {% if technical %}readonly{% endif %} required>
+  </div>
+</div>
+
+        <div class="form-group">
+          <label>Installation Address</label>
+          <textarea name="address" 
+            id="address_field" 
+            rows="3" 
+            placeholder="Street Name, Building Number, City, and Zip Code..." 
+            minlength="15" 
+            required
+            title="Please provide a full address including street name and city."></textarea>
+  <small id="address_hint" style="color: var(--muted); font-size: 0.75rem;">Min. 15 characters required.</small>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Preferred Inspection Date</label>
+            <input type="date" name="preferred_date" id="inspection_date" required>
+          </div>
+          <div class="form-group">
+            <label>Site Photo (Optional)</label>
+            <input type="file" name="site_photo" accept="image/*" style="padding: 10px;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea name="notes" rows="2" placeholder="Tell us about your roof type or specific requirements..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Installation Request</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function handleSourceChange() {
+      const source = document.getElementById('sourceSelector').value;
+      const sizeInput = document.getElementById('sys_size');
+      const panelInput = document.getElementById('panel_count');
+
+      // Use Django's template variables safely in JS
+      const estSize = "{{ technical.system_size|default:'' }}";
+      const estPanels = "{{ technical.panels_needed|default:'' }}";
+
+      if (source === 'external') {
+        sizeInput.value = '';
+        panelInput.value = '';
+        sizeInput.placeholder = "Enter kW";
+        panelInput.placeholder = "Enter count";
+      } else if (source === 'estimation' && estSize !== '') {
+        sizeInput.value = estSize;
+        panelInput.value = estPanels;
+      }
+    }
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // --- 1. Date Validation (Prevent Past Dates) ---
+    const dateInput = document.getElementById('inspection_date');
+    const today = new Date();
+    
+    const addressField = document.getElementById('address_field');
+    const addressHint = document.getElementById('address_hint');
+
+    addressField.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        if (currentLength < 30) {
+            addressHint.style.color = 'var(--error)';
+            addressHint.innerText = `Too short (${currentLength}/30 characters)`;
+            this.setCustomValidity("Please provide more detail in your address.");
+        } else {
+            addressHint.style.color = 'var(--accent)';
+            addressHint.innerText = "Address length looks good!";
+            this.setCustomValidity(""); // Clears the error
+        }
+    
+    })
+
+    // Format date to YYYY-MM-DD for the 'min' attribute
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    dateInput.setAttribute('min', minDate);
+
+    // --- 2. Real-time Negative Number Prevention (Extra Security) ---
+    const numericInputs = [document.getElementById('sys_size'), document.getElementById('panel_count')];
+    
+    numericInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value < 1) {
+                this.value = 1; // Reset to 0 if they try to bypass via typing
+            }
+        });
+    });
+});
+
+function toggleEquipmentFields() {
+    // 1. Correct IDs to match your HTML
+    const sourceSelector = document.getElementById('sourceSelector');
+    const sizeInput = document.getElementById('sys_size');
+    const panelInput = document.getElementById('panel_count');
+
+    // 2. Values from Django
+    const savedSize = "{{ technical.system_size|default:'' }}";
+    const savedPanels = "{{ technical.panels_needed|default:'' }}";
+
+    if (sourceSelector.value === 'external') {
+        // Clear fields and make them editable
+        sizeInput.value = "";
+        panelInput.value = "";
+        sizeInput.readOnly = false;
+        panelInput.readOnly = false;
+        sizeInput.placeholder = "Enter size in kW";
+        panelInput.placeholder = "Enter panel count";
+    } else {
+        // Restore saved estimation data and lock fields
+        sizeInput.value = savedSize;
+        panelInput.value = savedPanels;
+        sizeInput.readOnly = true;
+        panelInput.readOnly = true;
+    }
+}
+
+// Run once on page load to set initial state correctly
+window.onload = toggleEquipmentFields;
+</script>
+
+</body>
+</html>

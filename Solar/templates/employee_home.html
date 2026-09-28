@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Rayn Solar | Employee Portal</title>
+
+    <style>
+        :root {
+            --bg: #0b1325;
+            --panel: #111827;
+            --soft: #1f2937;
+            --accent: #7c83ff;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .dashboard-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar - Fixed to left */
+        .sidebar {
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 50px;
+            padding-left: 15px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+
+        .sidebar-link i { margin-right: 15px; width: 20px; text-align: center; }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(124, 131, 255, 0.1);
+            color: var(--text);
+        }
+
+        .sidebar-link.active { border: 1px solid rgba(124, 131, 255, 0.2); }
+
+        /* Main Content - Pushed right by sidebar width */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 60px 50px;
+            background: radial-gradient(circle at top right, rgba(124, 131, 255, 0.05), transparent);
+        }
+
+        .welcome h1 { font-size: 2.2rem; font-weight: 500; margin-bottom: 10px; }
+        .welcome span { color: var(--accent); }
+        .welcome p { color: var(--muted); margin-bottom: 40px; }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        /* Task Card Styling */
+        .work-card {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 24px;
+            transition: 0.3s;
+        }
+
+        .work-card:hover {
+            border-color: rgba(124, 131, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; padding: 20px 10px; }
+            .sidebar-brand, .sidebar-link span { display: none; }
+            .main-content { margin-left: 80px; }
+        }
+        /* Make sure empty state messages are visible */
+        .text-muted {
+            color: var(--muted) !important; /* This uses your #9ca3af color */
+            opacity: 0.8;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="sidebar">
+        <div class="sidebar-brand">Rayn Solar</div>
+        
+        <a href="?view=today" class="sidebar-link {% if not request.GET.view or request.GET.view == 'today' %}active{% endif %}">
+            <i class="fas fa-calendar-day"></i> <span>Today’s Work</span>
+        </a>
+        <a href="?view=upcoming" class="sidebar-link {% if request.GET.view == 'upcoming' %}active{% endif %}">
+            <i class="fas fa-calendar-alt"></i> <span>Upcoming Schedule</span>
+        </a>
+        <a href="?view=past" class="sidebar-link {% if request.GET.view == 'past' %}active{% endif %}">
+            <i class="fas fa-history"></i> <span>Completed Works</span>
+        </a>
+        <a href="/employee_profile/" class="sidebar-link">
+            <i class="fas fa-user-circle"></i> <span>My Profile</span>
+        </a>
+
+        <div class="mt-auto border-top border-secondary pt-3">
+            <a href="#" id="logoutTrigger" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="welcome">
+            <h1>Welcome back, <span>{{ employee.full_name }}</span></h1>
+            <p>Your workspace is ready. Calm, focused, and built for deep work.</p>
+        </div>
+
+        <div class="task-display-area">
+            {% if not request.GET.view or request.GET.view == 'today' %}
+                <h2 class="mb-4">Today's Priorities</h2>
+                <div class="task-grid">
+                    {% for task in today_tasks %}
+                        {% include 'includes/task_card.html' with show_button=True %}
+                    {% empty %}
+                        <div class="col-12 py-5 text-center" style="background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed var(--soft);">
+                            <i class="fas fa-clipboard-check mb-3" style="font-size: 2rem; color: var(--soft);"></i>
+                            <p class="text-muted">No tasks assigned for today. Enjoy the breather!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% elif request.GET.view == 'upcoming' %}
+                <h2 class="mb-4">Upcoming Schedule</h2>
+                <div class="task-grid">
+                    {% for task in upcoming_tasks %}
+                        {% include 'includes/task_card.html' with show_button=False %}
+                    {% empty %}
+                        <p class="text-muted">No upcoming work scheduled.</p>
+                    {% endfor %}
+                </div>
+
+            {% elif request.GET.view == 'past' %}
+                <h2 class="mb-4">Completed History</h2>
+                <div class="task-grid">
+                    {% for task in past_tasks %}
+                        {% include 'includes/task_card.html' with show_button=False %}
+                    {% empty %}
+                        <p class="text-muted">No completed history found.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="submitProofModal" timezone="-1" aria-labelledby="submitProofModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-white" style="background: var(--panel); border: 1px solid var(--soft);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title" id="submitProofModalLabel"><i class="fas fa-file-upload me-2 text-accent"></i>Submit Job Report Proof</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="proofSubmissionForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">1. WORK REPORT / PERFORMANCE TEXT (Mandatory)</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" name="report_text" rows="4" placeholder="Describe the physical state of site layout, components delivered, configurations setup..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">2. MEDIA PROOF: PHOTO / VIDEO (Mandatory)</label>
+                        <input type="file" class="form-control bg-dark text-white border-secondary" name="proof_file" accept="image/*,video/*" required>
+                        <div class="form-text text-secondary" style="font-size:0.75rem;">Accepted: Images (.jpg, .png) or short clips (.mp4)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">3. SYSTEM FEEDBACK LOG (Optional)</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" name="employee_feedback" placeholder="Any issues or operational flags?">
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-sm btn-outline-secondary text-white" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4" style="background-color: var(--accent); border-color: var(--accent);">Sign Off Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div class="browser-popup" style="background: var(--panel); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--soft); max-width: 400px; width: 90%;">
+        <h3 class="text-white mb-3">Confirm Logout</h3>
+        <p class="text-muted">Are you sure you want to end your current session?</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button class="btn btn-sm btn-outline-secondary text-white" onclick="closeLogoutModal()">Cancel</button>
+            <button class="btn btn-sm btn-danger px-4" onclick="confirmLogout()">Confirm Logout</button>
+        </div>
+    </div>
+</div>
+
+<div id="messageModal" class="modal-overlay"
+     style="display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.8);
+            z-index:9999;
+            align-items:center;
+            justify-content:center;">
+
+    <div style="background: var(--panel);
+                padding:30px;
+                border-radius:16px;
+                max-width:450px;
+                width:90%;
+                text-align:center;">
+
+        <h4 id="messageTitle"></h4>
+        <p id="messageText"></p>
+
+        <button class="btn btn-primary mt-3"
+                onclick="closeMessageModal()">
+            OK
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const status = new URLSearchParams(window.location.search).get('status');
+
+    if (status === 'success') {
+        alert('Task successfully completed! Report submitted to management.');
+    }
+
+    if (status === 'error') {
+        alert('Both a written report and a photo/video proof are mandatory to mark this work complete.');
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function openProofForm(assignmentId) {
+    const form = document.getElementById('proofSubmissionForm');
+    form.action = `/submit_work_report/${assignmentId}/`;
+    var proofModal = new bootstrap.Modal(document.getElementById('submitProofModal'));
+    proofModal.show();
+}
+</script>
+<script>
+    const logoutTrigger = document.getElementById('logoutTrigger');
+    const logoutModal = document.getElementById('logoutModal');
+
+    logoutTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        logoutModal.style.display = 'flex';
+    });
+
+    function closeLogoutModal() {
+        logoutModal.style.display = 'none';
+    }
+
+    function confirmLogout() {
+        // Redirects to your existing Django logout view
+        window.location.href = "{% url 'logout' %}"; 
+    }
+</script>
+
+</body>
+</html>

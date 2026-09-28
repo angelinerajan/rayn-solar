@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | Rayn Solar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            /* RESTRAINED PROFESSIONAL RAYN SOLAR PALETTE */
+            --bg-dark: #0b0d14;       /* Deep uniform dark slate canvas */
+            --card-dark: #121520;     /* Flat solid structural cards */
+            --border-dark: #202436;   /* Clean subtle grid layout borders */
+            --text-main: #e6e8ee;     /* High contrast readable body text */
+            --text-muted: #888f9e;    /* Muted structural subtitles */
+            --accent-burgundy: #a8242a; /* Muted primary brand identification */
+            --accent-purple: #8b5cf6;   /* Secondary focus brand point */
+            --success: #22c55e;
+            
+            /* Clean professional gradients built on brand notes */
+            --btn-gradient: linear-gradient(135deg, #a8242a, #701a1e);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .checkout-container {
+            background: var(--card-dark);
+            width: 100%;
+            max-width: 460px;
+            border-radius: 20px;
+            border: 1px solid var(--border-dark);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Premium Processing Overlay */
+        #loader {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 13, 20, 0.96);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 44px; height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .header {
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-dark);
+            text-align: center;
+        }
+
+        .order-summary {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Fixed text sizing for custom string injection */
+        .info-content-text { 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            line-height: 1.5;
+            color: var(--text-main);
+            padding: 0 10px;
+        }
+
+        .form-content { padding: 24px; }
+
+        .method-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .method-card:hover {
+            border-color: rgba(139, 92, 246, 0.25);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .method-label {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            gap: 14px;
+        }
+
+        .method-label input[type="radio"] {
+            margin: 0; 
+            width: 18px; 
+            height: 18px;
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+        }
+
+        .method-label i {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .details-area {
+            display: none;
+            padding: 4px 16px 18px 48px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 14px;
+            background: #07080d;
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent-purple);
+        }
+
+        ::placeholder {
+            color: #4e5564;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--btn-gradient);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover { 
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .secure-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .secure-footer i {
+            color: var(--success);
+        }
+        
+        .back-link {
+            display: block; 
+            text-align: center; 
+            color: var(--text-muted); 
+            font-size: 12px; 
+            margin-top: 18px; 
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+<div class="checkout-container">
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 18px; font-weight: 500; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-main);">Securely Processing Payment...</p>
+        <p style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted);">Please do not refresh or close this terminal window.</p>
+    </div>
+
+    <div class="header">
+        <div class="order-summary">Total Payable for Product(s)</div>
+        <div class="info-content-text" style="font-size: 2rem; font-weight: 800; color: var(--text-main);">₹{{ total }}</div>
+    </div>
+        <!-- <div class="info-content-text">Double-check calculation value variant: Total Amount field required for production rendering. Defaulting context: ₹{{ total }}</div> -->
+    
+    
+
+    <div class="form-content">
+        <form id="paymentForm" method="POST" action="{% url 'process_payment' %}">
+            {% csrf_token %}
+            
+            <div class="method-card">
+                <label class="method-label">
+                    <input type="radio" name="payment_method" value="upi" onclick="toggleDetails('upi')" checked>
+                    <span><i class="fas fa-mobile-alt"></i> UPI (G-Pay / PhonePe)</span>
+                </label>
+                <div id="details-upi" class="details-area" style="display: block;">
+                    <input type="text" name="upi_id" placeholder="Enter UPI ID (e.g., alex@okaxis)" required>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <label class="method-label">
+                    <input type="radio" name="payment_method" value="card" onclick="toggleDetails('card')">
+                    <span><i class="far fa-credit-card"></i> Credit / Debit Card</span>
+                </label>
+                <div id="details-card" class="details-area">
+                    <input type="text" placeholder="Card Number" maxlength="16" style="margin-bottom: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" name="expiry" placeholder="MM/YY" maxlength="5">
+                        <input type="text" name="cvv" placeholder="CVV" maxlength="3">
+                    </div>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <label class="method-label">
+                    <input type="radio" name="payment_method" value="netbanking" onclick="toggleDetails('netbanking')">
+                    <span><i class="fas fa-university"></i> Net Banking</span>
+                </label>
+                <div id="details-netbanking" class="details-area">
+                    <select name="bank_name"> 
+                        <option value="">Select Bank</option>
+                        <option value="SBI">State Bank of India</option>
+                        <option value="HDFC">HDFC Bank</option>
+                        <option value="ICICI">ICICI Bank</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" class="btn-submit" onclick="handlePayment()">
+                Complete Payment • ₹{{ total }}
+            </button>
+        </form>
+
+        <div class="secure-footer">
+            <i class="fas fa-shield-alt"></i> 256-bit SSL Gateway Encryption
+        </div>
+        
+        <a href="{% url 'view_cart' %}" class="back-link">
+            <i class="fas fa-chevron-left" style="font-size: 0.75rem; margin-right: 4px;"></i> Return to Shopping Cart
+        </a>
+       
+    </div>
+</div>
+
+<script>
+    function toggleDetails(method) {
+        document.querySelectorAll('.details-area').forEach(div => div.style.display = 'none');
+        document.getElementById('details-' + method).style.display = 'block';
+    }
+
+    window.onload = function() {
+        window.history.pushState(null, "", window.location.href);
+    };
+
+    let isProcessing = false;
+
+    window.onpopstate = function() {
+        if (isProcessing) {
+            window.history.pushState(null, "", window.location.href);
+            alert("Transaction in progress. Please do not navigate away or refresh.");
+        } else {
+            window.location.href = "{% url 'view_cart' %}";
+        }
+    };
+
+    function handlePayment() {
+    const form = document.getElementById('paymentForm');
+    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+    // 1. DYNAMIC FRONTEND VALIDATION
+    if (selectedMethod === 'upi') {
+        const upiInput = document.querySelector('input[name="upi_id"]');
+        if (!upiInput.value.trim()) {
+            alert("Please provide a valid UPI address to proceed.");
+            return;
+        }
+    } 
+    else if (selectedMethod === 'card') {
+        const cardNum = document.querySelector('#details-card input[placeholder="Card Number"]').value.trim();
+        const expiry = document.querySelector('input[name="expiry"]').value.trim();
+        const cvv = document.querySelector('input[name="cvv"]').value.trim();
+        
+        if (!cardNum || !expiry || !cvv) {
+            alert("Please fill out all card details fields.");
+            return;
+        }
+    } 
+    else if (selectedMethod === 'netbanking') {
+        const bankSelect = document.querySelector('select[name="bank_name"]').value;
+        if (!bankSelect) {
+            alert("Please select your bank to proceed.");
+            return;
+        }
+    }
+
+    // 2. PROCEED TO SUBMIT IF VALID
+    isProcessing = true;
+    window.history.pushState(null, "", window.location.href);
+
+    document.getElementById('loader').style.display = 'flex';
+    const payBtn = document.querySelector('.btn-submit');
+    payBtn.disabled = true;
+    payBtn.style.opacity = "0.6";
+    payBtn.innerText = "Authorizing Funds Gateway...";
+
+    setTimeout(() => {
+        form.submit();
+    }, 3000);
+}
+</script>
+
+</body>
+</html>

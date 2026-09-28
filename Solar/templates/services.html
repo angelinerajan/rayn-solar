@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RaynSolar | Our Services</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+    :root {
+      /* Deep, elegant plum-slate base */
+      --bg-dark: #120e14;
+      --bg-plum: #1c131d;
+      --card: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #e6e8ee;
+      --muted: #9aa0b4;
+      --accent: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      padding: 40px 20px;
+      /* Sophisticated deep plum gradient */
+      background: 
+        radial-gradient(circle at top, #2d1b33, #120e14 60%),
+        linear-gradient(to bottom, #120e14 0%, #1c131d 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Subtle, warm purple glow */
+    #glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      background: radial-gradient(800px circle at var(--x) var(--y), rgba(139, 92, 246, 0.05), transparent 80%);
+      z-index: 1;
+    }
+
+    .breadcrumb-wrapper { width: 100%; max-width: 1100px; margin-bottom: 40px; position: relative; z-index: 2; }
+    .breadcrumb { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--muted); }
+    .breadcrumb a { color: var(--text); text-decoration: none; transition: 0.25s; display: inline-flex; align-items: center; gap: 6px; }
+    .breadcrumb a:hover { color: var(--accent); }
+
+    .services-header { max-width: 800px; text-align: center; margin-bottom: 60px; position: relative; z-index: 2; }
+    .services-header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px; color: #ffffff; }
+    .services-header h1 span { color: var(--accent); }
+    .services-header p { font-size: 1.05rem; line-height: 1.6; color: var(--muted); }
+
+    /* Add this to your style block to remove the underlines */
+    h3, p, .service-features li {
+        text-decoration: none !important;
+    }
+
+    /* Also ensure your links don't force an underline */
+    .service-link {
+        text-decoration: none !important;
+    }
+        .services-container {
+      max-width: 1100px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-card {
+      background: var(--card);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 40px 30px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .service-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      /* Subtle purple tint for icons */
+      background: rgba(139, 92, 246, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      color: var(--accent);
+      font-size: 1.5rem;
+    }
+
+    .service-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: #fff; }
+    .service-card p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+    .service-features { list-style: none; margin-bottom: 30px; }
+    .service-features li { font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; color: #d1d5db; }
+    .service-features i { color: var(--accent); font-size: 0.8rem; }
+
+    .service-btn {
+      text-align: center;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.35s ease;
+    }
+
+    .service-card:hover .service-btn {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    @media (max-width: 1024px) { .services-container { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 650px) { .services-container { grid-template-columns: 1fr; } .services-header h1 { font-size: 2rem; } }
+  </style>
+</head>
+
+<body>
+
+  <div id="glow"></div>
+
+  <div class="breadcrumb-wrapper">
+    <div class="breadcrumb">
+      <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+      <span>Services</span>
+    </div>
+  </div>
+
+  <div class="services-header">
+    <h1>Our Solar <span>Services</span></h1>
+    <p>
+      Streamlined solutions for your renewable energy transition. <br>
+      High-precision estimation, quality products, and expert installation.
+    </p>
+  </div>
+
+  <div class="services-container">
+
+    <a href="{% url 'solar_estimation_form' %}" class="service-link">
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-calculator"></i></div>
+        <h3>Cost Estimation</h3>
+        <p>Advanced algorithmic breakdown of your potential solar investment based on real-time data.</p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> Load-wise breakdown</li>
+          <li><i class="fas fa-check"></i> Subsidy calculations</li>
+          <li><i class="fas fa-check"></i> ROI Projection</li>
+        </ul>
+        <div class="service-btn">Get Estimate</div>
+      </div>
+    </a>
+
+    <a href="/marketplace/" class="service-link">
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-shopping-cart"></i></div>
+        <h3>Solar Marketplace</h3>
+        <p>Curated selection of Tier-1 solar panels and smart inverters from verified manufacturers.</p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> Direct Warranty</li>
+          <li><i class="fas fa-check"></i> Secure Payments</li>
+          <li><i class="fas fa-check"></i> Bulk Discounts</li>
+        </ul>
+        <div class="service-btn">Shop Equipment</div>
+      </div>
+    </a>
+
+    <a href="/installation_request/" class="service-link">
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-tools"></i></div>
+        <h3>Expert Installation</h3>
+        <p>End-to-end technical execution by certified engineers following international safety standards.</p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> Structural Audit</li>
+          <li><i class="fas fa-check"></i> Grid Integration</li>
+          <li><i class="fas fa-check"></i> Annual Maintenance</li>
+        </ul>
+        <div class="service-btn">Book Appointment</div>
+      </div>
+    </a>
+
+  </div>
+
+  <script>
+    // Ambient light cursor tracker script
+    document.addEventListener('mousemove', (e) => {
+        document.documentElement.style.setProperty('--x', e.clientX + 'px');
+        document.documentElement.style.setProperty('--y', e.clientY + 'px');
+    });
+  </script>
+
+</body>
+</html>

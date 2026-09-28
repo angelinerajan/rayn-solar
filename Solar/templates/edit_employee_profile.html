@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Employee Profile</title>
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --border: #1f2937;
+            --accent: #7c83ff;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            background: radial-gradient(circle at top, #111827, var(--bg));
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .card {
+            background: linear-gradient(
+                180deg,
+                rgba(255,255,255,0.03),
+                rgba(255,255,255,0.01)
+            );
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        input[readonly] {
+            background: rgba(255,255,255,0.02);
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .photo-preview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .photo-preview img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-save:hover {
+            opacity: 0.85;
+        }
+
+        .btn-cancel {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h1>Edit Profile</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="photo-preview">
+                {% if employee.photo %}
+                    <img src="{{ employee.photo.url }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/90?text=User">
+                {% endif %}
+                <input type="file" name="photo">
+            </div>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" value="{{ employee.full_name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email (cannot be changed)</label>
+                <input type="email" value="{{ employee.email }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" value="{{ employee.phone_number }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" name="department" value="{{ employee.department }}">
+            </div>
+
+            <div class="form-group">
+                <label>Designation</label>
+                <input type="text" name="designation" value="{{ employee.designation }}">
+            </div>
+
+            <div class="form-group">
+                <label>Residential Address</label>
+                <textarea name="address">{{ employee.address }}</textarea>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-save">Save Changes</button>
+                <a href="{% url 'employee_profile' %}" class="btn btn-cancel">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

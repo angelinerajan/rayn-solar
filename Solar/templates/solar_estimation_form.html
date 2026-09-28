@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RaynSolar | Solar Cost Estimation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --bg-dark: #120e14;
+      --bg-plum: #1c131d;
+      --bg1: #300305;
+      --bg2: #141824;
+      --bg-mid: #0f111a;
+      --card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6e8ee;
+      --muted: #9aa0b4;
+      --accent: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh; padding: 40px 20px;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      background: 
+        radial-gradient(circle at top, #2d1b33, #120e14 60%),
+        linear-gradient(to bottom, #120e14 0%, #1c131d 100%);
+      color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-x: hidden;
+    }
+    #glow {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+      background: radial-gradient(800px circle at var(--x) var(--y), rgba(139, 92, 246, 0.03), transparent 80%);
+      z-index: 1;
+    }
+    .breadcrumb-wrapper { width: 100%; max-width: 900px; margin-bottom: 20px; position: relative; z-index: 2; }
+    .breadcrumb { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.5px; }
+    .breadcrumb a { color: var(--text); text-decoration: none; transition: 0.25s ease; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .estimation-container {
+      width: 100%; max-width: 900px; background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px; border: 1px solid var(--border); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.03);
+      padding: 40px; position: relative; z-index: 2;
+    }
+    .top-actions { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); color: var(--text); font-size: 0.8rem; font-weight: 500; text-decoration: none; transition: all 0.3s ease;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(139, 92, 246, 0.3); color: #fff; transform: translateY(-2px); }
+    .estimation-header { text-align: center; margin-bottom: 35px; }
+    .estimation-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; color: #ffffff; }
+    .estimation-header h1 span { background: linear-gradient(135deg, #ffffff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .estimation-header p { font-size: 0.95rem; color: var(--muted); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px; }
+    .form-group { display: flex; flex-direction: column; }
+    label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; }
+    input, select { padding: 14px 16px; border-radius: 12px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); color: var(--text); font-size: 14px; outline: none; transition: all 0.3s ease; }
+    input:focus, select:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.02); box-shadow: 0 0 12px rgba(139, 92, 246, 0.15); }
+    .hint { font-size: 0.75rem; color: #6b7280; margin-top: 6px; }
+    select option { background-color: var(--bg-mid); color: var(--text); padding: 12px; }
+    .extra-options-row { margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 25px; align-items: flex-end; }
+    .btn-submit { width: 100%; height: 48px; border-radius: 12px; border: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #ffffff; background: var(--accent-gradient); transition: all 0.35s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-submit:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 12px 25px rgba(124, 58, 237, 0.3); }
+    @media (max-width: 768px) { .form-grid, .extra-options-row { grid-template-columns: 1fr; } body { padding: 15px 10px; } .estimation-container { padding: 25px 20px; } .extra-options-row { gap: 20px; } }
+  </style>
+</head>
+<body>
+
+  <div id="glow"></div>
+
+  <div class="breadcrumb-wrapper">
+    <div class="breadcrumb">
+      <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+      <a href="/services/">Services</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+      <span>Solar Cost Estimation</span>
+    </div>
+  </div>
+
+  <div class="estimation-container">
+    <div class="top-actions">
+      <a href="{% url 'solar_history' %}" class="btn-secondary">
+        <i class="fas fa-history"></i> History
+      </a>
+      {% if last_estimation_id %}
+      <a href="{% url 'solar_recommendation' last_estimation_id %}" class="btn-secondary">
+        <i class="fas fa-redo"></i> Last Estimation
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="estimation-header">
+      <h1>Solar Cost <span>Estimation</span></h1>
+      <p>We only ask what directly affects your system cost.</p>
+    </div>
+
+    <form method="post" action="" id="solarForm" data-editing="{% if estimation %}true{% else %}false{% endif %}">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label>State / City</label>
+          <input type="text" name="location" id="location" placeholder="Eg: Kerala, Kochi" value="{{ estimation.location|default_if_none:'' }}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Monthly Usage (kWh)</label>
+          <input type="number" name="monthly_units" id="monthly_units" min="1" placeholder="Units per month" value="{{ estimation.monthly_units|default_if_none:'' }}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Building Type</label>
+          <select name="building_type" id="building_type" required>
+            <option value="">Select Type</option>
+            <option value="house" {% if estimation.building_type == "house" %}selected{% endif %}>House</option>
+            <option value="apartment" {% if estimation.building_type == "apartment" %}selected{% endif %}>Apartment</option>
+            <option value="factory" {% if estimation.building_type == "factory" %}selected{% endif %}>Factory</option>
+            <option value="warehouse" {% if estimation.building_type == "warehouse" %}selected{% endif %}>Warehouse</option>
+            <option value="hospital" {% if estimation.building_type == "hospital" %}selected{% endif %}>Hospital</option>
+            <option value="school" {% if estimation.building_type == "school" %}selected{% endif %}>School</option>
+            <option value="skyscraper" {% if estimation.building_type == "skyscraper" %}selected{% endif %}>Skyscraper</option>
+            <option value="office" {% if estimation.building_type == "office" %}selected{% endif %}>Office Building</option>
+            <option value="cultural" {% if estimation.building_type == "cultural" %}selected{% endif %}>Cultural Centre</option>
+            <option value="industrial" {% if estimation.building_type == "industrial" %}selected{% endif %}>Industrial Building</option>
+            <option value="carport" {% if estimation.building_type == "carport" %}selected{% endif %}>Residential Carports</option>
+            <option value="agricultural" {% if estimation.building_type == "agricultural" %}selected{% endif %}>Agricultural Building</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Roof Type</label>
+          <select name="roof_type" id="roof_type" required>
+            <option value="">Select Roof</option>
+            <option value="flat" {% if estimation.roof_type == "flat" %}selected{% endif %}>Flat</option>
+            <option value="sloped" {% if estimation.roof_type == "sloped" %}selected{% endif %}>Sloped</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Approx Roof Area (sq.ft)</label>
+          <input type="number" name="roof_area" id="roof_area" min="50" placeholder="Eg: 800" value="{{ estimation.roof_area|default_if_none:'' }}" required>
+          <p id="area_hint" class="hint">Typically 100 sq.ft per 1kW system.</p>
+        </div>
+
+        <div class="form-group">
+          <label>Power Cut Frequency</label>
+          <select name="power_cut" id="power_cut" required>
+            <option value="">Select Frequency</option>
+            <option value="none" {% if estimation.power_cut == "none" %}selected{% endif %}>None</option>
+            <option value="occasional" {% if estimation.power_cut == "occasional" %}selected{% endif %}>Occasional</option>
+            <option value="frequent" {% if estimation.power_cut == "frequent" %}selected{% endif %}>Frequent</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Backup Required?</label>
+          <select name="backup_required" id="backup_required" required>
+            <option value="">Select</option>
+            <option value="yes" {% if estimation.backup_required == "yes" %}selected{% endif %}>Yes</option>
+            <option value="no" {% if estimation.backup_required == "no" %}selected{% endif %}>No</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Government Subsidy Model</label>
+          <select name="apply_subsidy" id="sub_toggle" onchange="toggleSubsidy()">
+            <option value="no" {% if estimation.apply_subsidy == "no" %}selected{% endif %}>No Subsidy</option>
+            <option value="percentage" {% if estimation.apply_subsidy == "percentage" %}selected{% endif %}>Custom Percentage (%)</option>
+            <option value="fixed_amount" {% if estimation.apply_subsidy == "fixed_amount" %}selected{% endif %}>Custom Fixed Amount (₹)</option>
+          </select>
+          
+          <div id="pct_input_div" style="display:none; margin-top: 10px;">
+            <input type="number" name="subsidy_percentage" id="subsidy_percentage" min="1" max="100" placeholder="Enter percentage (e.g. 40)" value="{{ estimation.subsidy_percentage|default:'' }}">
+          </div>
+
+          <div id="amt_input_div" style="display:none; margin-top: 10px;">
+            <input type="number" name="subsidy_fixed_amount" id="subsidy_fixed_amount" min="1" placeholder="Enter cash amount (e.g. 30000)" value="{{ estimation.subsidy_fixed_amount|default:'' }}">
+          </div>
+        </div>
+      </div>
+
+      <div class="extra-options-row">
+        <div class="form-group">
+          <label>Lightning Protection</label>
+          <select name="lightning_protection" id="lightning_protection">
+            <option value="no" {% if estimation.lightning_protection == "no" %}selected{% endif %}>No</option>
+            <option value="yes" {% if estimation.lightning_protection == "yes" %}selected{% endif %}>Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Surge Protection</label>
+          <select name="surge_protection" id="surge_protection">
+            <option value="no" {% if estimation.surge_protection == "no" %}selected{% endif %}>No</option>
+            <option value="yes" {% if estimation.surge_protection == "yes" %}selected{% endif %}>Yes</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-bolt"></i> Calculate Cost
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('mousemove', function(e) {
+        document.documentElement.style.setProperty('--x', e.clientX + 'px');
+        document.documentElement.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    function toggleSubsidy() {
+        const toggleValue = document.getElementById('sub_toggle').value;
+        const pctDiv = document.getElementById('pct_input_div');
+        const amtDiv = document.getElementById('amt_input_div');
+        const pctInput = document.getElementById('subsidy_percentage');
+        const amtInput = document.getElementById('subsidy_fixed_amount');
+        
+        pctDiv.style.display = 'none';
+        amtDiv.style.display = 'none';
+        pctInput.removeAttribute('required');
+        amtInput.removeAttribute('required');
+
+        if (toggleValue === 'percentage') {
+            pctDiv.style.display = 'block';
+            pctInput.setAttribute('required', 'true');
+        } else if (toggleValue === 'fixed_amount') {
+            amtDiv.style.display = 'block';
+            amtInput.setAttribute('required', 'true');
+        }
+    }
+
+    // --- REFRESH PERSISTENCE (LOCAL STORAGE) ---
+    const formFields = [
+        'location', 'monthly_units', 'building_type', 'roof_type', 
+        'roof_area', 'power_cut', 'backup_required', 'sub_toggle',
+        'subsidy_percentage', 'subsidy_fixed_amount', 
+        'lightning_protection', 'surge_protection'
+    ];
+
+    const formElement = document.getElementById('solarForm');
+    const isEditing = formElement.getAttribute('data-editing') === 'true';
+
+    // Load cached draft form values ONLY if we aren't editing a database record
+    window.addEventListener('DOMContentLoaded', function() {
+        if (!isEditing) {
+            formFields.forEach(function(fieldId) {
+                const savedValue = localStorage.getItem('draft_' + fieldId);
+                const inputElement = document.getElementById(fieldId);
+                if (savedValue && inputElement) {
+                    inputElement.value = savedValue;
+                }
+            });
+        }
+        toggleSubsidy(); 
+    });
+
+    // Save values as they type or select option elements (Only if not editing existing data)
+    if (!isEditing) {
+        formFields.forEach(function(fieldId) {
+            const inputElement = document.getElementById(fieldId);
+            if (inputElement) {
+                inputElement.addEventListener('input', function() {
+                    localStorage.setItem('draft_' + fieldId, inputElement.value);
+                });
+                inputElement.addEventListener('change', function() {
+                    localStorage.setItem('draft_' + fieldId, inputElement.value);
+                });
+            }
+        });
+    }
+
+    // Clear local cache when form is explicitly submitted successfully
+    formElement.addEventListener('submit', function() {
+        if (!isEditing) {
+            formFields.forEach(function(fieldId) {
+                localStorage.removeItem('draft_' + fieldId);
+            });
+        }
+    });
+
+    // System range calculation validation guard
+    formElement.addEventListener('submit', function(e) {
+        const units = parseFloat(document.getElementById('monthly_units').value);
+        const area = parseFloat(document.getElementById('roof_area').value);
+        const minRecommendedArea = Math.ceil((units / 120) * 100);
+
+        if (area < minRecommendedArea) {
+            e.preventDefault();
+            alert(`Warning: Based on your ${units} kWh usage, you likely need at least ${minRecommendedArea} sq.ft of roof area for an effective solar setup. Please adjust your area.`);
+        }
+    });
+  </script>
+</body>
+</html>

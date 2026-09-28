@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Registration | SolarScope</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+    --bg: #0b1325;
+    --panel: #111827;
+    --soft: #1f2937;
+    --accent: #7c83ff;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Inter","Segoe UI",sans-serif;
+    background:
+        radial-gradient(circle at top right, rgba(124,131,255,0.05), transparent),
+        var(--bg);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--text);
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+    background:var(--panel);
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+    box-shadow:0 25px 50px rgba(0,0,0,0.45);
+}
+
+.header{
+    padding:35px 30px;
+    text-align:center;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    background:rgba(255,255,255,0.02);
+}
+
+.header h2{
+    font-size:1.9rem;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.header h2 span{
+    color:var(--accent);
+}
+
+.header p{
+    color:var(--muted);
+    font-size:0.95rem;
+}
+
+.form-container{
+    padding:35px 30px;
+}
+
+.form-group{
+    margin-bottom:22px;
+    position:relative;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:0.88rem;
+    font-weight:500;
+    color:var(--muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:14px 16px 14px 44px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.08);
+    background:var(--soft);
+    color:var(--text);
+    font-size:0.95rem;
+    transition:all 0.25s ease;
+}
+
+.form-group textarea{
+    resize:none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder{
+    color:rgba(255,255,255,0.25);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:#243042;
+    box-shadow:0 0 0 3px rgba(124,131,255,0.15);
+}
+
+.form-group .icon{
+    position:absolute;
+    left:15px;
+    top:41px;
+    color:var(--muted);
+    font-size:0.95rem;
+}
+
+.form-group.photo input{
+    padding-left:16px;
+}
+
+button[type="submit"]{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg, var(--accent), #5d65e8);
+    color:#0b1325;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.25s ease;
+    margin-top:10px;
+}
+
+button[type="submit"]:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 24px rgba(124,131,255,0.25);
+}
+
+.messages{
+    margin:20px 30px 0;
+    padding:14px;
+    border-radius:10px;
+    text-align:center;
+    font-size:0.9rem;
+}
+
+.messages.error{
+    background:rgba(239,68,68,0.1);
+    border:1px solid rgba(239,68,68,0.2);
+    color:#fca5a5;
+}
+
+.messages.success{
+    background:rgba(16,185,129,0.1);
+    border:1px solid rgba(16,185,129,0.2);
+    color:#6ee7b7;
+}
+
+.error-text{
+    color:#f87171;
+    font-size:11px;
+    margin-top:5px;
+    display:block;
+    min-height:14px;
+}
+
+.input-error{
+    border-color:#ef4444 !important;
+}
+
+.home-btn{
+    position:fixed;
+    top:30px;
+    left:30px;
+    z-index:1000;
+}
+
+.home-btn a{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    border-radius:999px;
+    text-decoration:none;
+    font-size:0.85rem;
+    font-weight:500;
+    color:var(--text);
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:0 10px 25px rgba(0,0,0,0.35);
+    transition:all 0.25s ease;
+}
+
+.home-btn a:hover{
+    border-color:var(--accent);
+}
+
+@media(max-width:600px){
+
+    .container{
+        max-width:100%;
+    }
+
+    .header{
+        padding:28px 22px;
+    }
+
+    .form-container{
+        padding:28px 22px;
+    }
+
+    .home-btn{
+        top:15px;
+        left:15px;
+    }
+}
+/* SUCCESS MODAL */
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    opacity:0;
+    visibility:hidden;
+    transition:0.3s ease;
+    z-index:5000;
+}
+
+.modal-overlay.active{
+    opacity:1;
+    visibility:visible;
+}
+
+.browser-popup{
+    width:90%;
+    max-width:450px;
+    background:#111827;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 25px 60px rgba(0,0,0,0.5);
+    animation:popupScale .35s ease;
+}
+
+@keyframes popupScale{
+    from{
+        opacity:0;
+        transform:scale(.9);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.popup-icon-badge{
+    width:80px;
+    height:80px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(16,185,129,.15);
+}
+
+.popup-icon-badge i{
+    color:#10b981;
+    font-size:40px;
+}
+
+.browser-popup h3{
+    font-size:1.6rem;
+    margin-bottom:10px;
+}
+
+.browser-popup p{
+    color:var(--muted);
+    line-height:1.6;
+    margin-bottom:25px;
+}
+
+.popup-btn{
+    border:none;
+    cursor:pointer;
+    border-radius:10px;
+    padding:14px 26px;
+    font-size:15px;
+    font-weight:600;
+}
+
+.popup-btn.primary{
+    background:linear-gradient(
+        135deg,
+        var(--accent),
+        #5d65e8
+    );
+    color:white;
+}
+</style>
+</head>
+<body>
+    <div id="registration-context"
+        data-success="{% if success_registration %}true{% else %}false{% endif %}"
+        style="display:none;">
+    </div>
+  <div class="home-btn">
+    <a href="/"><i class="fas fa-home"></i> Home</a>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h2>Employee <span>Register</span></h2>
+      <p>Create your account to get started</p>
+    </div>
+
+    {% if msg %}
+    <div class="messages error">
+        {{ msg }}
+    </div>
+    {% endif %}
+
+    <form id="empRegForm" method="POST" enctype="multipart/form-data" class="form-container" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="full_name">Full Name</label>
+        <i class="fas fa-user icon"></i>
+        <input type="text" name="full_name" id="full_name" placeholder="John Doe">
+        <span class="error-text" id="nameError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <i class="fas fa-envelope icon"></i>
+        <input type="email" name="email" id="email" placeholder="john@example.com">
+        <span class="error-text" id="emailError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="phone_number">Phone Number</label>
+        <i class="fas fa-phone icon"></i>
+        <input type="tel" name="phone_number" id="phone_number" placeholder="9876543210">
+        <span class="error-text" id="phoneError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <i class="fas fa-lock icon"></i>
+        <input type="password" name="password" id="password" placeholder="••••••••">
+        <span class="error-text" id="passError"></span>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <i class="fas fa-lock icon"></i>
+        <input type="password" name="confirm_password" id="confirm_password" placeholder="••••••••">
+        <span class="error-text" id="confirmPassError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department</label>
+        <i class="fas fa-building icon"></i>
+        <select name="department" id="department">
+          <option value="" disabled selected>Select department</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Human Resources">Human Resources</option>
+          <option value="Finance">Finance</option>
+          <option value="Operations">Operations</option>
+          <option value="Sales">Sales</option>
+          <option value="Support">Customer Support</option>
+          <option value="Other">Other</option>
+        </select>
+        <span class="error-text" id="deptError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="designation">Designation</label>
+        <i class="fas fa-briefcase icon"></i>
+        <input type="text" name="designation" id="designation" placeholder="Software Engineer">
+        <span class="error-text" id="desigError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="residential_address">Residential Address</label>
+        <i class="fas fa-home icon"></i>
+        <textarea name="residential_address" id="residential_address" rows="3" placeholder="House no, Street, Area, City, State, Pincode" style="resize: none;"></textarea>
+        <span class="error-text" id="addressError"></span>
+      </div>
+
+      <div class="form-group photo">
+        <label for="photo">Profile Photo</label>
+        <i class="fas fa-image icon"></i>
+        <input type="file" name="photo" id="photo" accept="image/*">
+        <span class="error-text" id="photoError"></span>
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+<div class="modal-overlay" id="successModal">
+    <div class="browser-popup">
+
+        <div class="popup-icon-badge">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h3>Registration Successful</h3>
+
+        <p>
+            Your employee account has been created successfully.
+            You can now log in to access your dashboard.
+        </p>
+
+        <button
+            class="popup-btn primary"
+            data-url="{% url 'employee_login' %}"
+            onclick="window.location.href=this.dataset.url">
+
+            Go to Login
+
+        </button>
+
+    </div>
+</div>
+<script>
+const registrationContext =
+    document.getElementById('registration-context');
+
+if (
+    registrationContext &&
+    registrationContext.dataset.success === 'true'
+) {
+    document.getElementById('successModal')
+            .classList.add('active');
+}
+</script>
+  
+<script>
+const form = document.getElementById('empRegForm');
+
+form.addEventListener('submit', (e) => {
+
+    let isValid = true;
+
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const validate = (id, errorId, condition, message) => {
+
+        const input = document.getElementById(id);
+        const error = document.getElementById(errorId);
+
+        if (condition) {
+            error.textContent = message;
+            input.classList.add('input-error');
+            isValid = false;
+        } else {
+            error.textContent = "";
+            input.classList.remove('input-error');
+        }
+    };
+
+    // 1. Full Name
+    const nameVal = document.getElementById('full_name').value.trim();
+
+    validate(
+        'full_name',
+        'nameError',
+        nameVal.length < 3 || !nameRegex.test(nameVal),
+        "Enter a valid name (letters only, minimum 3 characters)."
+    );
+
+    // 2. Email
+    const emailVal = document.getElementById('email').value.trim();
+
+    validate(
+        'email',
+        'emailError',
+        !emailRegex.test(emailVal),
+        "Please enter a valid email address."
+    );
+
+    // 3. Phone Number
+    const phoneVal = document.getElementById('phone_number').value.trim();
+
+    validate(
+        'phone_number',
+        'phoneError',
+        !/^\d{10}$/.test(phoneVal),
+        "Phone number must contain exactly 10 digits."
+    );
+
+    // 4. Password
+    const passVal = document.getElementById('password').value;
+
+    validate(
+        'password',
+        'passError',
+        passVal.length < 6,
+        "Password must be at least 6 characters."
+    );
+
+    // 5. Confirm Password
+    const confirmPassVal = document.getElementById('confirm_password').value;
+
+    validate(
+        'confirm_password',
+        'confirmPassError',
+        confirmPassVal === "" || passVal !== confirmPassVal,
+        "Passwords do not match."
+    );
+
+    // 6. Department
+    const deptVal = document.getElementById('department').value;
+
+    validate(
+        'department',
+        'deptError',
+        deptVal === "",
+        "Please select a department."
+    );
+
+    // 7. Designation
+    const desigVal = document.getElementById('designation').value.trim();
+
+    validate(
+        'designation',
+        'desigError',
+        desigVal.length < 2,
+        "Enter a valid designation."
+    );
+
+    // 8. Address
+    const addrVal = document.getElementById('residential_address').value.trim();
+
+    validate(
+        'residential_address',
+        'addressError',
+        addrVal.length < 10,
+        "Please provide a complete address."
+    );
+
+    // 9. Profile Photo Validation
+    const photoInput = document.getElementById('photo');
+    if (photoInput.files.length > 0) {
+
+        const file = photoInput.files[0];
+
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/jpg',
+            'image/webp'
+        ];
+
+        validate(
+            'photo',
+            'photoError',
+            !allowedTypes.includes(file.type),
+            "Only JPG, JPEG, PNG, and WEBP images are allowed."
+        );
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+    }
+
+});
+</script>
+  
+</body>
+</html>

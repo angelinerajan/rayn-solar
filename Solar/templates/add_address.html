@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+  :root {
+    /* Brighter, more vibrant gradients */
+    --bg1: #0d4a3e; --bg2: #060b1a; 
+    /* Lighter frosted glass effect */
+    --card: rgba(255, 255, 255, 0.08); 
+    --border: rgba(255, 255, 255, 0.2);
+    --input-bg: rgba(255, 255, 255, 0.1);
+    --text: #ffffff; 
+    --muted: #cbd5e1; /* Lighter grey for labels */
+    --accent: #4ade80; /* Brighter green */
+    --accent-hover: #22c55e;
+  }
+
+  body {
+    background: radial-gradient(circle at top left, var(--bg1), var(--bg2));
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .address-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--card);
+    backdrop-filter: blur(25px) saturate(150%);
+    -webkit-backdrop-filter: blur(25px) saturate(150%);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 40px;
+    /* Added a subtle green glow to the card */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(74, 222, 128, 0.05);
+  }
+
+  h2 {
+    margin: 0 0 30px 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+  }
+
+  .form-group {
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  /* Make placeholder text more visible */
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2);
+  }
+
+  .row {
+    display: flex;
+    gap: 15px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 18px;
+    background: var(--accent);
+    color: #052e16; /* Dark green text for contrast */
+    border: none;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 10px 15px -3px rgba(74, 222, 128, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    background: #ffffff;
+    color: #052e16;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -3px rgba(74, 222, 128, 0.4);
+  }
+
+  .back-to-cart {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .back-to-cart:hover {
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="address-card">
+    <h2>Shipping Details</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="full_name" placeholder="John Doe" value="{{ address.full_name|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" placeholder="+91 00000 00000" value="{{ address.phone|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Complete Address</label>
+            <textarea name="address_line" placeholder="Street, Building, Apartment No." required>{{ address.address_line|default:'' }}</textarea>
+        </div>
+
+        <div class="row">
+            <div class="form-group" style="flex: 1;">
+                <label>City</label>
+                <input type="text" name="city" placeholder="City" value="{{ address.city|default:'' }}" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Pincode</label>
+                <input type="text" name="pincode" placeholder="600001" value="{{ address.pincode|default:'' }}" required>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Save & Continue to Checkout
+        </button>
+
+        <a href="{% url 'view_cart' %}" class="back-to-cart">← Back to Cart</a>
+    </form>
+</div>
+</body>
+</html>

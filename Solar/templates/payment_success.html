@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful | Rayn Solar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            /* RESTRAINED PROFESSIONAL RAYN SOLAR PALETTE */
+            --bg-dark: #0b0d14;       /* Deep uniform dark slate canvas */
+            --card-dark: #121520;     /* Flat solid structural cards */
+            --border-dark: #202436;   /* Clean subtle grid layout borders */
+            --text-main: #e6e8ee;     /* High contrast readable body text */
+            --text-muted: #888f9e;    /* Muted structural subtitles */
+            --accent-purple: #8b5cf6;   /* Focus highlight brand point */
+            --success: #22c55e;       /* Professional success emerald */
+            
+            /* Clean professional gradients built on brand notes */
+            --btn-gradient: linear-gradient(135deg, #a8242a, #701a1e);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .success-card {
+            background: var(--card-dark);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-dark);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .icon-circle {
+            width: 74px; height: 74px;
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 24px;
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        h2 { 
+            color: var(--text-main); 
+            margin: 0 0 10px; 
+            font-size: 1.65rem; 
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle { 
+            color: var(--text-muted); 
+            margin-bottom: 30px; 
+            font-size: 0.95rem; 
+            line-height: 1.5;
+        }
+
+        /* Itemized List Box adapted to dark layout rules */
+        .order-box {
+            background-color: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 28px;
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .product-item:last-child { border-bottom: none; }
+
+        .prod-info .name { 
+            display: block; 
+            font-weight: 600; 
+            color: var(--text-main); 
+            font-size: 0.95rem; 
+        }
+        
+        .prod-info .qty { 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            margin-top: 2px;
+            display: inline-block;
+        }
+        
+        .prod-price { 
+            font-weight: 600; 
+            color: var(--text-main); 
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 18px;
+            border-top: 1px dashed var(--border-dark);
+        }
+
+        .total-label { 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .total-value { 
+            font-size: 1.35rem; 
+            font-weight: 800; 
+            color: var(--text-main); 
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            display: block;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .btn-primary { 
+            background: var(--btn-gradient); 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .btn-primary:hover { 
+            filter: brightness(1.1);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.99);
+        }
+
+        .btn-outline { 
+            background: rgba(255, 255, 255, 0.01); 
+            color: var(--text-muted); 
+            border: 1px solid var(--border-dark); 
+        }
+        
+        .btn-outline:hover { 
+            background: rgba(255, 255, 255, 0.03); 
+            color: var(--text-main);
+            border-color: rgba(139, 92, 246, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+  <div class="success-card">
+      <div class="icon-circle">
+          <i class="fas fa-check"></i>
+      </div>
+      
+      <h2>Order Placed! 🎉</h2>
+      <p class="subtitle">Your payment was successful. Our team is preparing your solar components for dispatch.</p>
+
+      <div class="order-box">
+          {% for item in payments %}
+          <div class="product-item">
+              <div class="prod-info">
+                  <span class="name">{{ item.product.name }}</span>
+                  <span class="qty">Quantity: {{ item.quantity }}</span>
+              </div>
+              <div class="prod-price">₹{{ item.total_price }}</div>
+          </div>
+          {% endfor %}
+
+          <div class="total-section">
+              <span class="total-label">Amount Paid</span>
+              <span class="total-value">₹{{ total }}</span>
+          </div>
+      </div>
+
+      <div class="btn-group">
+          <a href="{% url 'product_marketplace' %}" class="btn btn-primary">
+              Continue Shopping
+          </a>
+          <a href="{% url 'product_orders' %}" class="btn btn-outline">
+              <i class="fas fa-box-open" style="margin-right: 6px; font-size: 0.9rem;"></i> Track My Orders
+          </a>
+      </div>
+  </div>
+
+  <script>
+    // Forcefully rewrite the browser history tracking stack 
+    // to point back to the marketplace root instead of the payment processing endpoint
+    window.onload = function () {
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.location.replace("{% url 'product_marketplace' %}");
+        };
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RaynSolar | User Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+:root {
+    /* SHARED PREMIUM THEME PALETTE */
+    --bg1: #300305;       /* Deep luxurious burgundy */
+    --bg2: #141824;       /* Twilight midnight blue */
+    --bg-mid: #0f111a;    /* Deep slate tone for clean balance */
+    --card: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e6e8ee;      /* Clean crisp text */
+    --muted: #9aa0b4;     /* Soft slate grey */
+    --accent: #8b5cf6;    /* Vibrant purple signature accent */
+    --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    /* Shared ambient atmospheric background layer stack */
+    background: 
+      radial-gradient(circle at top, var(--bg2), transparent 55%),
+      linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 30%, var(--bg-mid) 100%);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 20px; /* Generous breathing space for structural layout scrollability */
+    overflow-x: hidden;
+}
+
+/* INTERACTIVE CURSOR GLOW OVERLAY */
+#glow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: radial-gradient(800px circle at var(--x) var(--y), rgba(139, 92, 246, 0.03), transparent 80%);
+    z-index: 1;
+}
+
+.registration-container {
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 540px; /* Optimized container footprint layout for split registration input clusters */
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 2;
+    transition: border-color 0.3s ease;
+}
+
+/* SHARED PORTAL FEATURE: Highlights container borders on structural element hover */
+.registration-container:hover {
+    border-color: rgba(139, 92, 246, 0.25);
+}
+
+.registration-container h2 {
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #ffffff; /* Explicitly sets primary word text element to pure white */
+}
+
+.registration-container h2 span {
+    background: linear-gradient(135deg, #ffffff, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: #fff;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+}
+
+/* Custom styled parameters for file selectors */
+.input-group input[type="file"] {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.input-group input[type="file"]::-webkit-file-upload-button {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    padding: 6px 12px;
+    margin-right: 10px;
+    transition: background 0.2s;
+}
+
+.input-group input[type="file"]::-webkit-file-upload-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Client Side Error Typography Metrics */
+.error-text {
+    color: #fca5a5;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    min-height: 14px;
+}
+
+.input-error {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Django Message Pipeline Alerts */
+.alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+
+.alert.success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #a7f3d0;
+}
+
+.alert.error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+/* Input Form Row Layout Elements */
+.row {
+    display: flex;
+    gap: 16px;
+}
+
+.row .input-group {
+    flex: 1;
+}
+
+/* ACTION BUTTON - CONFIGURED TO MATCH BALANCED LOWERED BRIGHTNESS */
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent-gradient);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    filter: brightness(0.8);
+    transition: all 0.35s ease;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.95);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+}
+
+/* Floating Back Utility Control */
+.back-floating {
+    position: fixed;
+    left: 32px;
+    top: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.25s ease;
+    z-index: 1000;
+}
+
+.back-floating i {
+    font-size: 0.85rem;
+    transition: transform 0.2s ease;
+}
+
+.back-floating:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent);
+    transform: translateX(-2px);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+.login-link p {
+    margin-bottom: 6px;
+    color: var(--muted);
+}
+
+.login-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.25s ease;
+}
+
+.login-link a:hover {
+    filter: brightness(1.2);
+    text-decoration: underline;
+}
+
+/* Responsiveness metrics fallback */
+@media (max-width: 500px) {
+    .row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+
+/* SUCCESS MODAL */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(2, 4, 12, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: all 0.25s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.browser-popup {
+    width: 90%;
+    max-width: 430px;
+    background: #13121a;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 20px;
+    padding: 35px 30px;
+    text-align: center;
+
+    box-shadow:
+        0 30px 60px rgba(0,0,0,0.6),
+        0 0 40px rgba(139,92,246,0.15);
+
+    transform: scale(0.95);
+    transition: transform 0.25s ease;
+}
+
+.modal-overlay.active .browser-popup {
+    transform: scale(1);
+}
+
+.popup-icon-badge {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.3);
+
+    color: #8b5cf6;
+    font-size: 1.8rem;
+}
+
+.browser-popup h3 {
+    color: white;
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+}
+
+.browser-popup p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.popup-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.popup-btn.primary {
+    background: linear-gradient(
+        135deg,
+        #8b5cf6,
+        #7c3aed
+    );
+
+    color: white;
+
+    box-shadow: 0 4px 15px rgba(139,92,246,0.25);
+}
+
+.popup-btn.primary:hover {
+    transform: translateY(-1px);
+}
+</style>
+</head>
+
+<body>
+<div id="registration-context"
+     data-success="{% if success_registration %}true{% else %}false{% endif %}"
+     style="display:none;">
+</div>
+
+<div id="glow"></div>
+
+<a href="/" class="back-floating">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back</span>
+</a>
+
+<div class="registration-container">
+    <h2>User <span>Registration</span></h2>
+    <p class="subtitle">Create your account to estimate solar costs</p>
+
+    {% if msg %}
+        <div class="alert error">
+            {{ msg }}
+        </div>
+    {% endif %}
+
+    <form id="regForm" method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" name="full_name" id="full_name" placeholder="John Doe">
+            <span class="error-text" id="nameError"></span>
+        </div>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" name="email" id="email" placeholder="name@example.com">
+            <span class="error-text" id="emailError"></span>
+        </div>
+
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="tel" name="phone_number" id="phone" placeholder="10-digit number">
+            <span class="error-text" id="phoneError"></span>
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" name="password" required>
+            <span class="error-text" id="passError"></span>
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <small id="passwordError" style="color:red; display:none;">
+                Passwords do not match
+            </small>
+        </div>
+
+        <div class="input-group">
+            <label>Street Address</label>
+            <input type="text" name="street_address" id="address" placeholder="123 Main St">
+            <span class="error-text" id="addressError"></span>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label>City</label>
+                <input type="text" name="city" id="city" placeholder="City">
+                <span class="error-text" id="cityError"></span>
+            </div>
+            <div class="input-group">
+                <label>State</label>
+                <input type="text" name="state" id="state" placeholder="State">
+                <span class="error-text" id="stateError"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label>Pincode</label>
+                <input type="text" name="pincode" id="pincode" placeholder="6-digit PIN">
+                <span class="error-text" id="pinError"></span>
+            </div>
+            <div class="input-group">
+                <label>Country</label>
+                <input type="text" name="country" id="country" placeholder="Country">
+                <span class="error-text" id="countryError"></span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Profile Photo</label>
+            <input type="file" name="photo" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn">Register Account</button>
+        
+        <div class="login-link">
+            <p>Already have an account?</p>
+            <a href="/user_login/">Login here</a>
+        </div>
+    </form>
+</div>
+
+<div class="modal-overlay" id="successModal">
+    <div class="browser-popup">
+        <div class="popup-icon-badge">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h3>Registration Successful</h3>
+
+        <p>
+            Your account has been created successfully.
+            You can now log in to access your dashboard.
+        </p>
+
+        <div class="popup-actions">
+            <button
+                class="popup-btn primary"
+                data-url="{% url 'user_login' %}"
+                onclick="window.location.href=this.dataset.url">
+                Go to Login
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+const registrationContext =
+    document.getElementById('registration-context');
+
+if (
+    registrationContext &&
+    registrationContext.getAttribute('data-success') === 'true'
+) {
+    document.getElementById('successModal')
+            .classList.add('active');
+}
+</script>
+<script>
+    // Maintains the smooth mouse tracker ambient glow found on your landing page
+    document.addEventListener('mousemove', (e) => {
+        document.documentElement.style.setProperty('--x', e.clientX + 'px');
+        document.documentElement.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    // Form validation script logic tracking standard criteria rulesets
+    const form = document.getElementById('regForm');
+
+    form.addEventListener('submit', (e) => {
+        let isValid = true;
+
+        const validate = (id, errorId, condition, message) => {
+            const input = document.getElementById(id);
+            const error = document.getElementById(errorId);
+            if (condition) {
+                error.textContent = message;
+                input.classList.add('input-error');
+                isValid = false;
+            } else {
+                error.textContent = "";
+                input.classList.remove('input-error');
+            }
+        };
+        
+        const nameRegex = /^[A-Za-z\s]+$/;
+
+        // 1. Full Name (Min 3 chars)
+        const nameVal = document.getElementById('full_name').value.trim();
+        validate('full_name', 'nameError', nameVal.length < 3 || !nameRegex.test(nameVal), "Name must be at least 3 characters and contain only letters.");
+        
+        // 2. Email (Regex)
+        const emailVal = document.getElementById('email').value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        validate('email', 'emailError', !emailRegex.test(emailVal), "Enter a valid email address.");
+
+        // 3. Phone (10 Digits)
+        const phoneVal = document.getElementById('phone').value.trim();
+        validate('phone', 'phoneError', !/^\d{10}$/.test(phoneVal), "Phone must be exactly 10 digits.");
+
+        // 4. Password (Min 8 chars)
+        const passVal = document.getElementById('password').value;
+        validate('password', 'passError', passVal.length < 6, "Password must be at least 6 characters.");
+
+        // 5. Address (Check if empty)
+        validate('address', 'addressError', document.getElementById('address').value.trim() === "", "Address is required.");
+        
+        // 6. City Validation
+        const cityVal = document.getElementById('city').value.trim();
+        validate('city', 'cityError', cityVal === "" || !nameRegex.test(cityVal), "City is required and should not contain numbers or special characters.");
+
+        // 7. State Validation
+        const stateVal = document.getElementById('state').value.trim();
+        validate('state', 'stateError', stateVal === "" || !nameRegex.test(stateVal),"State is required and should not contain numbers or special characters.");
+
+        // 8. Country Validation
+        const countryVal = document.getElementById('country').value.trim();
+        validate('country', 'countryError', countryVal === "" || !nameRegex.test(countryVal), "Country is required and should not contain numbers or special characters.");
+
+        // 9. Pincode (6 Digits)
+        const pinVal = document.getElementById('pincode').value.trim();
+        validate('pincode', 'pinError', !/^\d{6}$/.test(pinVal), "Enter a valid 6-digit pincode.");
+
+        if (!isValid) {
+            e.preventDefault(); // Halt standard submit action sequence if fields flags are broken
+        }
+    });
+</script>
+<script>
+    document.querySelector("form").addEventListener("submit", function(e) {
+
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirm_password").value;
+        const error = document.getElementById("passwordError");
+
+        if (password !== confirmPassword) {
+            e.preventDefault(); // stop form submission
+            error.style.display = "block";
+        } else {
+            error.style.display = "none";
+        }
+
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Installation History | Rayn Solar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            /* RAYN SOLAR SIGNATURE BACKGROUND AND HOVER TONES */
+            --bg1: #300305;       /* Deep luxurious burgundy */
+            --bg2: #141824;       /* Twilight midnight blue */
+            --bg-mid: #0f111a;    /* Deep slate tone to break up excessive contrast */
+            --card: rgba(255,255,255,0.04); 
+            --border: rgba(255,255,255,0.08);
+            --text: #e6e8ee; 
+            --muted: #9aa0b4; 
+            --accent: #8b5cf6;     /* Vibrant purple signature accent */
+            --accent2: #06b6d4;    /* Light teal secondary accent */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            padding: 30px;
+            /* Smooth mixed dark multi-gradient match */
+            background: 
+                radial-gradient(circle at top, var(--bg2), transparent 55%),
+                linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 100%);
+            background-attachment: scroll;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* MATCHED BREADCRUMB STYLE FROM REQUEST PAGE */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            color: var(--muted);
+        }
+
+        .breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .history-card {
+            background: var(--card); 
+            border: 1px solid var(--border);
+            border-radius: 20px; 
+            padding: 30px; 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            background: linear-gradient(135deg, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+
+        /* Default Alignment */
+        th, td { padding: 18px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        
+        /* Header Styling */
+        th { 
+            color: var(--muted); font-size: 0.75rem; text-transform: uppercase; 
+            letter-spacing: 0.05em; border-bottom: 2px solid var(--border);
+        }
+
+        /* --- Alignment Logic --- */
+        /* 1. Date Requested (Left) */
+        th:nth-child(1), td:nth-child(1) { text-align: left; width: 15%; }
+        
+        /* 2. System Size, 3. Status, 4. Scheduled Date (Centered) */
+        th:nth-child(2), td:nth-child(2),
+        th:nth-child(3), td:nth-child(3),
+        th:nth-child(4), td:nth-child(4) { text-align: center; }
+
+        /* 5. Actions (Left) */
+        th:nth-child(5), td:nth-child(5) { text-align: left; width: 25%; }
+
+        /* Muted Status Badge Styling Realigned to Palette Tones */
+        .status-badge { 
+            padding: 5px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; 
+            display: inline-flex; align-items: center; white-space: nowrap;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .status-pending   { color: #fbbf24; background: rgba(251, 191, 36, 0.06); border-color: rgba(251, 191, 36, 0.15); }
+        .status-approved  { color: #60a5fa; background: rgba(96, 165, 250, 0.06); border-color: rgba(96, 165, 250, 0.15); }
+        .status-completed { color: #34d399; background: rgba(52, 211, 153, 0.06); border-color: rgba(52, 211, 153, 0.15); }
+        .status-rejected  { color: #f87171; background: rgba(248, 113, 113, 0.06); border-color: rgba(248, 113, 113, 0.15); }
+
+        /* Contact Links Center Fix */
+        .contact-group { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+        .contact-link { color: var(--muted); text-decoration: none; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; }
+        .contact-link:hover { color: var(--text); }
+
+        /* Action Column (Left Aligned Fix) */
+        .action-container { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+        .reason-box { max-width: 280px; font-size: 0.75rem; color: var(--muted); font-style: italic; line-height: 1.4; }
+        .action-amount { font-size: 1rem; font-weight: 700; color: var(--text); display: block; margin-bottom: 2px; }
+        
+        /* RESTORED RECEIPT ROW POSITIONING PACKED TO THE LEFT */
+        .payment-status-row {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="breadcrumb" style="justify-content: space-between; width: 100%;">
+        <div>
+            <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/services/">Services</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/installation_request/"> Request Installation</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Installation History</span>
+        </div>
+        
+        <a href="{% url 'installation_request' %}" style="text-decoration: none; font-size: 0.85rem; color: var(--accent2); border: 1px solid var(--accent2); padding: 6px 14px; border-radius: 10px; transition: 0.3s;">
+            <i class="fas fa-plus"></i> New Request
+        </a>
+    </div>
+
+    <div class="history-card">
+        <div style="margin-bottom: 20px;">
+            <h2 style="margin: 0;"><i class="fas fa-list-ul"></i> Installation History</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date Requested</th>
+                    <th>System Size</th>
+                    <th>Status</th>
+                    <th>Scheduled Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr>
+                    <td class="no-wrap">{{ item.created_at|date:"d M Y" }}</td>
+                    <td class="no-wrap">{{ item.system_size }} kW</td>
+                    <td>
+                        <span class="status-badge 
+                            {% if item.status == 'pending' %}status-pending
+                            {% elif item.status == 'approved' or item.status == 'investigation_scheduled' %}status-approved
+                            {% elif item.status == 'completed' %}status-completed
+                            {% elif item.status == 'rejected' %}status-rejected
+                            {% endif %}">
+                            {{ item.get_status_display }}
+                        </span>
+                    </td>
+                    
+                    <td>
+                        <div style="margin-bottom: 4px;">
+                            {% if item.status == 'pending' %}
+                                <small style="color: var(--muted); font-size: 0.8rem;">Pref: {{ item.preferred_date }}</small>
+                            {% elif item.status == 'investigation_scheduled' %}
+                                <strong style="color: var(--text); font-size: 0.85rem;">Visit: {{ item.preferred_date }}</strong>
+                            {% elif item.status == 'approved' %}
+                                <strong style="color: var(--text); font-size: 0.85rem;">Install: {{ item.installation_date }}</strong>
+                            {% else %}
+                                <span style="color: var(--muted); opacity: 0.5;">—</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="contact-group">
+                            <a href="https://wa.me/7736167716?text=I'd like to discuss Request #{{ item.id }}" 
+                            class="contact-link" 
+                            title="{% if item.status == 'rejected' %}For more info send us a message on WhatsApp{% else %}If you want to contact admin, message on WhatsApp{% endif %}">
+                                <i class="fab fa-whatsapp" style="color: #25d366;"></i> Whatsapp
+                            </a>
+
+                            <a href="mailto:rayn.solar2026@gmail.com?subject=Contact Request - #{{ item.id }}" 
+                            class="contact-link" 
+                            title="{% if item.status == 'rejected' %}For more info send us an email{% else %}If you want to contact admin, send us an email{% endif %}">
+                                <i class="fas fa-envelope" style="color: #3b82f6;"></i> Email
+                            </a>
+                        </div>
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <div class="action-container">
+                            {% if item.status == 'completed' %}
+                                {% if item.installation_amount %}
+                                    <div class="payment-info" style="width: 100%;">
+                                        <strong class="action-amount">₹{{ item.installation_amount }}</strong>
+                                        {% if item.installationpayment.status == 'paid' %}
+                                            <div class="payment-status-row">
+                                                <div style="color: #34d399; font-size: 0.85rem; font-weight: bold;">
+                                                    <i class="fas fa-check-circle"></i> Paid
+                                                </div>
+                                                <a href="{% url 'view_installation_receipt' item.installationpayment.id %}" 
+                                                target="_blank"
+                                                style="color: var(--muted); text-decoration: none; font-size: 0.8rem;"
+                                                title="Download Receipt">
+                                                    <i class="fas fa-file-invoice"></i> Receipt
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            <a href="{% url 'pay_installation' item.id %}" 
+                                            style="color: #34d399; font-size: 0.8rem; text-decoration: none; border: 1px solid rgba(52, 211, 153, 0.4); padding: 4px 12px; border-radius: 6px; display: inline-block;">
+                                            Pay Now
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span style="color: var(--muted); font-size: 0.75rem;">Awaiting Amount...</span>
+                                {% endif %}
+
+                            {% elif item.status == 'rejected' %}
+                                <div class="reason-box">
+                                    <strong>Reason:</strong> {{ item.admin_feedback|default:"Requirements not met." }}
+                                </div>
+
+                            {% else %}
+                                <a href="{% url 'delete_installation_request' item.id %}" 
+                                onclick="return confirm('Delete this request?')"
+                                style="color: #f87171; text-decoration: none; font-size: 0.75rem; border: 1px solid rgba(248, 113, 113, 0.2); padding: 5px 10px; border-radius: 6px;">
+                                Delete Request
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

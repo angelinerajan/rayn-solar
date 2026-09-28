@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Product | Rayn Solar Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 850px;
+            margin: 50px auto;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+            border-left: 4px solid #0d6efd;
+            padding-left: 10px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+        .btn-save { background: #2c3e50; color: white; padding: 12px 30px; font-weight: 600; border: none; transition: 0.3s; }
+        .btn-save:hover { background: #1a252f; transform: translateY(-2px); color: white; }
+        .spec-group { transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="m-0">
+            {% if edit_mode %}
+                Edit Product Details
+            {% else %}
+                Register New Item
+            {% endif %}
+        </h2>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="productForm">
+        {% csrf_token %}
+
+        <div class="section-title mt-0">Product Identity</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Utility Group</label>
+                <select name="utility_group" id="id_utility_group" class="form-select" onchange="filterCategories()" required {% if edit_mode %}disabled{% endif %}>
+                    {% for key, val in utility_groups %}
+                        <option value="{{ key }}">{{ val }}</option>
+                    {% endfor %}
+                </select>
+                {% if edit_mode %}
+                    <input type="hidden" name="utility_group" value="{{ product.utility_group }}">
+                {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <select name="category" id="id_category" class="form-select" onchange="handleCategoryChange()" required {% if edit_mode %}disabled{% endif %}>
+                    <option value="">-- Select Utility Group First --</option>
+                </select>
+                {% if edit_mode %}
+                    <input type="hidden" name="category" value="{{ product.category }}">
+                {% endif %}
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Brand</label>
+                <input type="text" name="brand" class="form-control" value="{{ product.brand|default:'' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Country of Origin</label>
+                <input type="text" name="country_of_origin" class="form-control" value="{{ product.country_of_origin|default:'India' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Model Number</label>
+                <input type="text" name="model_no" class="form-control" value="{{ product.model_no|default:'' }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="name" class="form-control" value="{{ product.name|default:'' }}" required>
+            </div>
+            <div class="col-12 mt-3">
+                <label class="form-label">Full Product Description</label>
+                <textarea name="description" class="form-control" rows="4">{{ product.description|default:'' }}</textarea>
+                <small class="text-muted">Provide a comprehensive overview of the product's capabilities.</small>
+            </div>
+        </div>
+
+
+        <!-- <option value="Mono-PERC">Mono-PERC: (High Efficiency / Modern Standard)</option>
+                        <option value="Monocrystalline">Monocrystalline: (Standard High Performance)</option>
+                        <option value="Polycrystalline">Polycrystalline: (Budget / Classic)</option>
+                        <option value="Thin-Film">Thin-Film (Flexible)</option>
+                        <option value="Bifacial">Bifacial Mono</option> -->
+        <!-- Dynamic Specs Area -->
+        <div id="panel-specs" class="spec-group mt-3" style="display:none;">
+            <div class="section-title">Solar Panel Details</div>
+            <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">Cell Material</label><select name="spec_material" class="form-select">
+                        <option value="N/A" selected>-- Not Specified / Not Applicable --</option>
+                        <option value="Mono-PERC">Mono-PERC</option>
+                        <option value="Monocrystalline">Monocrystalline</option>
+                        <option value="Polycrystalline">Polycrystalline</option>
+                        <option value="Thin-Film">Thin-Film</option>
+                        <option value="Bifacial">Bifacial Mono</option>
+                    </select>
+                </div>
+                <div class="col-md-4"><label class="form-label">No. of Cells</label><input type="text" name="spec_cells" class="form-control" placeholder="144 Cells"></div>
+                <div class="col-md-4"><label class="form-label">Dimensions</label><input type="text" name="dimensions" class="form-control" placeholder="2279 x 1134 x 35mm"></div>
+                <div class="col-md-4"><label class="form-label">Open Circuit Voltage (Voc)</label><input type="text" name="spec_voc" class="form-control" placeholder="e.g. 22V"></div>
+                <div class="col-md-4"><label class="form-label">Short Circuit Current (Isc)</label><input type="text" name="spec_isc" class="form-control" placeholder="e.g. 6.28A"></div>
+            </div>
+        </div>
+
+        <div id="appliance-specs" class="spec-group mt-3" style="display:none;">
+
+            <div class="section-title">Appliance Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Power Consumption</label>
+                    <input type="text"
+                        name="spec_wattage"
+                        class="form-control"
+                        placeholder="50W">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Battery Backup</label>
+                    <input type="text"
+                        name="spec_backup"
+                        class="form-control"
+                        placeholder="8 Hours">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Operating Voltage</label>
+                    <input type="text"
+                        name="spec_appliance_voltage"
+                        class="form-control"
+                        placeholder="12V DC">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Application Area</label>
+                    <input type="text"
+                        name="spec_application"
+                        class="form-control"
+                        placeholder="Home / Street / Farm">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Body Material</label>
+                    <input type="text"
+                        name="spec_body_material"
+                        class="form-control"
+                        placeholder="ABS Plastic / Metal">
+                </div>
+
+            </div>
+
+        </div>
+        
+        <div id="inverter-specs" class="spec-group mt-3" style="display:none;">
+            <div class="section-title">Inverter Technical Details</div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Waveform</label>
+                    <select name="spec_waveform" class="form-select">
+                        <option value="Pure Sine Wave">Pure Sine Wave</option>
+                        <option value="Modified Sine Wave">Modified Sine Wave</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Inverter Type</label>
+                    <select name="spec_inverter_type" class="form-select">
+                        <option value="String">String (Standard)</option>
+                        <option value="Microinverter">Microinverter</option>
+                        <option value="Optimizer">Power Optimizer</option>
+                        <option value="Hybrid">Hybrid (Battery Ready)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Battery Included?</label>
+                    <select name="spec_battery_included" class="form-select">
+                        <!-- Setting 'No' as selected by default -->
+                        <option value="No" selected>No (Inverter Only)</option>
+                        <option value="Yes">Yes (Combo Pack)</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Typical Load / Backup Estimate</label>
+                    <input type="text" name="spec_backup_desc" class="form-control" placeholder="e.g. 8 hrs for 3 Fans and 2 Tubes">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Max PV Input (Watts)</label>
+                    <input type="text" name="spec_max_pv" class="form-control" placeholder="e.g. 1500W">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Max Charge Current (A)</label>
+                    <input type="text" name="spec_charge_curr" class="form-control" placeholder="e.g. 50A">
+                </div>
+                <!-- <div class="col-md-6">
+                    <label class="form-label">Efficiency (%)</label>
+                    <input type="text" name="spec_efficiency" class="form-control" placeholder="e.g. 95%">
+                </div> -->
+                <!-- <div class="col-md-6">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="text" name="spec_weight" class="form-control" placeholder="e.g. 12kg">
+                </div> -->
+            </div>
+            
+            <div class="section-title">Physical Specifications</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Dimensions (L x W x H) cm</label>
+                    <input type="text" name="dimensions" class="form-control" placeholder="e.g. 37.5 x 31.5 x 13.5">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Net Weight (kg)</label>
+                    <input type="text" name="weight" class="form-control" placeholder="e.g. 15.8 kg">
+                </div>
+            </div>
+        </div>
+        <div id="mppt-specs" class="spec-group mt-3" style="display:none;">
+            <div class="section-title">MPPT Charger Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Max PV Voltage</label>
+                    <input type="text" name="spec_mppt_pv_voltage"
+                        class="form-control"
+                        placeholder="e.g. 150V">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Charging Current</label>
+                    <input type="text" name="spec_mppt_current"
+                        class="form-control"
+                        placeholder="e.g. 60A">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Supported Battery Types</label>
+                    <input type="text" name="spec_mppt_battery"
+                        class="form-control"
+                        placeholder="Lead Acid, Lithium">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Tracking Efficiency</label>
+                    <input type="text" name="spec_mppt_efficiency"
+                        class="form-control"
+                        placeholder="e.g. 99%">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Cooling Method</label>
+                    <input type="text" name="spec_mppt_cooling"
+                        class="form-control"
+                        placeholder="Fan / Natural Cooling">
+                </div>
+
+            </div>
+        </div>
+        <div id="protection-specs" class="spec-group mt-3" style="display:none;">
+
+            <div class="section-title">Protection Device Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Protection Type</label>
+                    <select name="spec_protection_type" class="form-select">
+                        <option>SPD</option>
+                        <option>MCB</option>
+                        <option>MCCB</option>
+                        <option>Fuse</option>
+                        <option>Lightning Arrestor</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Rated Current</label>
+                    <input type="text"
+                        name="spec_protection_current"
+                        class="form-control"
+                        placeholder="32A">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Voltage Rating</label>
+                    <input type="text"
+                        name="spec_protection_voltage"
+                        class="form-control"
+                        placeholder="600V">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Poles</label>
+                    <input type="text"
+                        name="spec_protection_poles"
+                        class="form-control"
+                        placeholder="1P, 2P, 4P">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">IP Rating</label>
+                    <input type="text"
+                        name="spec_protection_ip"
+                        class="form-control"
+                        placeholder="IP65">
+                </div>
+
+            </div>
+
+        </div>
+        <div id="heater-specs" class="spec-group mt-3" style="display:none;">
+
+            <div class="section-title">Solar Water Heater Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Tank Capacity</label>
+                    <input type="text"
+                        name="spec_heater_capacity"
+                        class="form-control"
+                        placeholder="200 LPD">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Collector Type</label>
+                    <select name="spec_heater_collector" class="form-select">
+                        <option>ETC</option>
+                        <option>FPC</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tank Material</label>
+                    <input type="text"
+                        name="spec_heater_material"
+                        class="form-control"
+                        placeholder="SS304">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Insulation</label>
+                    <input type="text"
+                        name="spec_heater_insulation"
+                        class="form-control"
+                        placeholder="PUF">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Max Temperature</label>
+                    <input type="text"
+                        name="spec_heater_temp"
+                        class="form-control"
+                        placeholder="80°C">
+                </div>
+
+            </div>
+
+        </div>
+        <div id="structure-specs" class="spec-group mt-3" style="display:none;">
+            <div class="section-title">Mounting Structure Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Material</label>
+                    <input type="text" name="spec_structure_material"
+                        class="form-control"
+                        placeholder="GI / Aluminium">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Mount Type</label>
+                    <input type="text" name="spec_structure_type"
+                        class="form-control"
+                        placeholder="Roof Top / Ground Mount">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Wind Resistance</label>
+                    <input type="text" name="spec_structure_wind"
+                        class="form-control"
+                        placeholder="150 km/h">
+                </div>
+
+            </div>
+        </div>
+        <div id="battery-specs" class="spec-group mt-3" style="display:none;">
+            <div class="section-title">Battery Details</div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Battery Type</label>
+                    <select name="spec_battery_type" class="form-select">
+                        <option>Lead Acid</option>
+                        <option>Tubular</option>
+                        <option>Lithium-Ion</option>
+                        <option>LFP</option>
+                        <option>Gel</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Capacity</label>
+                    <input type="text"
+                        name="spec_battery_capacity"
+                        class="form-control"
+                        placeholder="150Ah">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Battery Voltage</label>
+                    <input type="text"
+                        name="spec_battery_voltage"
+                        class="form-control"
+                        placeholder="12V">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Cycle Life</label>
+                    <input type="text"
+                        name="spec_battery_cycle"
+                        class="form-control"
+                        placeholder="6000 Cycles">
+                </div>
+
+                <!-- <div class="col-md-6">
+                    <label class="form-label">Warranty</label>
+                    <input type="text"
+                        name="spec_battery_warranty"
+                        class="form-control"
+                        placeholder="5 Years">
+                </div> -->
+
+            </div>
+        </div>
+
+        <div id="dynamicSpecsSection" class="spec-group" style="display:none;">
+            <div class="section-title">Technical Specifications</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" id="ratingLabel">Rating</label>
+                    <select name="rating" id="ratingSelect" class="form-select"></select>
+                </div>
+                <div class="col-md-6" id="voltageContainer">
+                    <label class="form-label">System Voltage</label>
+                    <select name="voltage" class="form-select">
+                        <option value="12V">12V DC</option>
+                        <option value="24V">24V DC</option>
+                        <option value="48V">48V DC</option>
+                        <option value="220V">220V AC</option>
+                        <option value="N/A">Not Applicable</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Quality & Assurance</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Efficiency / Performance Rating</label>
+                <input type="text" name="efficiency" class="form-control" value="{{ product.efficiency|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Warranty (Years)</label>
+                <input type="number" name="warranty_years" class="form-control" value="{{ product.warranty_years|default:'0' }}" min="0">
+                <small class="text-muted">Enter 0 if the product has no warranty.</small>
+            </div>
+            <div class="col-12">
+                <label class="form-label text-primary fw-bold">Key Highlights (What makes this stand out?)</label>
+                <textarea name="highlights" class="form-control" rows="3">{{ product.highlights|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="section-title">Commerce & Inventory</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Unit Price (₹)</label>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" step="1" name="price" id="priceInput" class="form-control" value="{{ product.price|default:'' }}" required>
+                </div>
+                <small id="priceWarning" class="text-danger" style="display:none;">Min suggested: ₹<span id="minPriceLabel"></span></small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Stock Quantity</label>
+                <input type="number" name="stock" class="form-control" value="{{ product.stock_quantity|default:'0' }}" min="0">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Product Image</label>
+                
+                {% if edit_mode and product.image %}
+                    <div class="mb-2">
+                        <img src="{{ product.image.url }}" width="100" class="img-thumbnail d-block">
+                    </div>
+                {% endif %}
+
+                <input type="file" name="image" class="form-control" {% if not edit_mode %}required{% endif %}>
+                
+                {% if edit_mode %}
+                    <small class="text-muted">Upload a new image to replace the current one.</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <button type="submit" class="btn btn-save">
+                {% if edit_mode %}
+                    Update Product
+                {% else %}
+                    Save to Rayn Inventory
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+// Mapping categories to Utility Groups
+const categoryMapping = {
+    'infra': [
+        {key: 'panel', val: 'Solar Panel'},
+        {key: 'inverter', val: 'Inverter'},
+        {key: 'battery', val: 'Battery'},
+        {key: 'mppt', val: 'MPPT Charger'},
+        {key: 'protection', val: 'Protection Devices'},
+        {key: 'structure', val: 'Mounting Structure'}
+    ],
+    'appliance': [
+        {key: 'light', val: 'Solar Light'},
+        {key: 'fan', val: 'Solar Fan'},
+        {key: 'pump', val: 'Solar Pump'},
+        {key: 'heater', val: 'Solar Water Heater'}
+    ],
+    'other': [
+        {key: 'other', val: 'Miscellaneous'}
+    ]
+};
+
+const solarSpecs = {
+    'panel': {
+        label: 'Wattage',
+        options: ['110W','400W', '450W', '550W'],
+        showVoltage: false,
+        minPrice: 3000
+    },
+
+    'inverter': {
+        label: 'Output (kW)',
+        options: ['2.5KW','3kW', '5kW', '8kW', '10kW'],
+        showVoltage: true,
+        minPrice: 25000
+    },
+
+    'battery': {
+        label: 'Capacity (Ah)',
+        options: ['100Ah', '150Ah', '200Ah'],
+        showVoltage: true,
+        minPrice: 12000
+    },
+
+    'mppt': {
+        label: 'Current (A)',
+        options: ['40A', '60A', '100A'],
+        showVoltage: true,
+        minPrice: 5000
+    },
+
+    'protection': {
+        label: 'Rating',
+        options: ['32A', '63A', '100A'],
+        showVoltage: false,
+        minPrice: 500
+    },
+
+    'light': {
+        label: 'Brightness (Lm)',
+        options: ['1000Lm', '2000Lm', '5000Lm'],
+        showVoltage: false,
+        minPrice: 1500
+    },
+
+    'fan': {
+        label: 'Sweep (mm)',
+        options: ['300mm', '400mm', '1200mm'],
+        showVoltage: true,
+        minPrice: 2500
+    },
+    'pump': {
+        label: 'Flow Rate',
+        options: ['1HP', '2HP', '3HP', '5HP'],
+        showVoltage: true,
+        minPrice: 15000
+    },
+
+    'heater': {
+        label: 'Capacity',
+        options: ['100 LPD','200 LPD','300 LPD'],
+        showVoltage: false,
+        minPrice: 12000
+    },
+
+    'structure': {
+        label: 'Panel Capacity',
+        options: ['1kW','3kW','5kW','10kW'],
+        showVoltage: false,
+        minPrice: 3000
+    }
+};
+
+function filterCategories() {
+
+    const group = document.getElementById('id_utility_group').value;
+    const catSelect = document.getElementById('id_category');
+
+    catSelect.innerHTML = '<option value="">-- Select Category --</option>';
+
+    if (categoryMapping[group]) {
+
+        categoryMapping[group].forEach(item => {
+
+            let opt = new Option(item.val, item.key);
+
+            catSelect.add(opt);
+
+        });
+    }
+}
+
+function handleCategoryChange() {
+
+    const cat = document.getElementById('id_category').value;
+
+    const dynamicSection = document.getElementById('dynamicSpecsSection');
+
+    const ratingSelect = document.getElementById('ratingSelect');
+
+    const ratingLabel = document.getElementById('ratingLabel');
+
+    const voltageContainer = document.getElementById('voltageContainer');
+
+    const priceInput = document.getElementById('priceInput');
+
+    const priceWarning = document.getElementById('priceWarning');
+
+    const minPriceLabel = document.getElementById('minPriceLabel');
+
+    document.querySelectorAll('.spec-group').forEach(el => {
+        el.style.display = 'none';
+    });
+
+    if (solarSpecs[cat]) {
+
+        const spec = solarSpecs[cat];
+
+        dynamicSection.style.display = 'block';
+
+        ratingLabel.innerText = spec.label;
+
+        ratingSelect.innerHTML = '';
+
+        spec.options.forEach(opt => {
+
+            let optEl = new Option(opt, opt);
+
+            ratingSelect.add(optEl);
+
+        });
+
+        voltageContainer.style.display = spec.showVoltage ? 'block' : 'none';
+
+        priceInput.min = spec.minPrice;
+
+        minPriceLabel.innerText = spec.minPrice.toLocaleString('en-IN');
+
+        priceWarning.style.display = 'block';
+
+    } else {
+
+        dynamicSection.style.display = 'none';
+
+        priceWarning.style.display = 'none';
+    }
+
+    if (cat === 'panel') {
+
+        document.getElementById('panel-specs').style.display = 'block';
+
+    } else if (cat === 'inverter') {
+
+        document.getElementById('inverter-specs').style.display = 'block';
+
+    } else if (['light', 'fan', 'pump'].includes(cat)) {
+
+        document.getElementById('appliance-specs').style.display = 'block';
+    }
+
+    else if(cat === 'battery'){
+        document.getElementById('battery-specs').style.display = 'block';
+    }
+    else if(cat === 'mppt'){
+        document.getElementById('mppt-specs').style.display = 'block';
+    }
+    else if(cat === 'protection'){
+        document.getElementById('protection-specs').style.display = 'block';
+    }
+    else if(cat === 'structure'){
+        document.getElementById('structure-specs').style.display = 'block';
+    }
+    else if(cat === 'heater'){
+        document.getElementById('heater-specs').style.display = 'block';
+    }
+}
+
+window.onload = function () {
+
+    // EDIT MODE VALUES
+    const isEditMode = "{{ edit_mode|yesno:'true,false' }}" === "true";
+
+    const utilityGroup = "{{ product.utility_group|default:'' }}";
+
+    const category = "{{ product.category|default:'' }}";
+
+    let technicalSpecs = {};
+
+    try {
+        technicalSpecs = JSON.parse(
+            '{{ product.technical_specs_json|escapejs }}'
+        );
+    } catch (e) {
+        technicalSpecs = {};
+    }
+
+    // Populate utility group
+    if (isEditMode) {
+
+        document.getElementById('id_utility_group').value = utilityGroup;
+    }
+
+    // Load categories
+    filterCategories();
+
+    // Set category
+    if (isEditMode) {
+
+        document.getElementById('id_category').value = category;
+    }
+
+    // Trigger dynamic UI
+    handleCategoryChange();
+
+    // PREFILL TECHNICAL SPECS
+
+    if (isEditMode) {
+                if (technicalSpecs["Voltage"]) {
+            const voltageField =
+                document.querySelector('[name="voltage"]');
+
+            if (voltageField) {
+                voltageField.value = technicalSpecs["Voltage"];
+            }
+        }
+
+        // PANEL
+        if (category === 'panel') {
+
+            if (technicalSpecs.Material) {
+                document.querySelector('[name="spec_material"]').value = technicalSpecs.Material;
+            }
+
+            if (technicalSpecs.Cells) {
+                document.querySelector('[name="spec_cells"]').value = technicalSpecs.Cells;
+            }
+
+            if (technicalSpecs.Voc) {
+                document.querySelector('[name="spec_voc"]').value = technicalSpecs.Voc;
+            }
+
+            if (technicalSpecs.Isc) {
+                document.querySelector('[name="spec_isc"]').value = technicalSpecs.Isc;
+            }
+
+            if (technicalSpecs.Dimensions) {
+                document.querySelector('[name="dimensions"]').value = technicalSpecs.Dimensions;
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+
+        // INVERTER
+        if (category === 'inverter') {
+
+            if (technicalSpecs["Waveform"]) {
+                document.querySelector('[name="spec_waveform"]').value = technicalSpecs["Waveform"];
+            }
+
+            if (technicalSpecs["Inverter Type"]) {
+                document.querySelector('[name="spec_inverter_type"]').value = technicalSpecs["Inverter Type"];
+            }
+
+            if (technicalSpecs["Battery Included"]) {
+                document.querySelector('[name="spec_battery_included"]').value = technicalSpecs["Battery Included"];
+            }
+
+            if (technicalSpecs["Typical Load/Backup"]) {
+                document.querySelector('[name="spec_backup_desc"]').value = technicalSpecs["Typical Load/Backup"];
+            }
+
+            if (technicalSpecs["Max PV Input"]) {
+                document.querySelector('[name="spec_max_pv"]').value = technicalSpecs["Max PV Input"];
+            }
+
+            if (technicalSpecs["Max Charge Current"]) {
+                document.querySelector('[name="spec_charge_curr"]').value = technicalSpecs["Max Charge Current"];
+            }
+
+            if (technicalSpecs["Weight"]) {
+                document.querySelector('[name="weight"]').value = technicalSpecs["Weight"];
+            }
+            if (technicalSpecs["Dimensions"]) {
+                document.querySelector('[name="dimensions"]').value =
+                    technicalSpecs["Dimensions"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+
+        // BATTERY
+        if (category === 'battery') {
+
+            if (technicalSpecs["Battery Type"]) {
+                document.querySelector('[name="spec_battery_type"]').value =
+                    technicalSpecs["Battery Type"];
+            }
+
+            if (technicalSpecs["Capacity"]) {
+                document.querySelector('[name="spec_battery_capacity"]').value =
+                    technicalSpecs["Capacity"];
+            }
+
+            if (technicalSpecs["Voltage"]) {
+                document.querySelector('[name="spec_battery_voltage"]').value =
+                    technicalSpecs["Voltage"];
+            }
+
+            if (technicalSpecs["Cycle Life"]) {
+                document.querySelector('[name="spec_battery_cycle"]').value =
+                    technicalSpecs["Cycle Life"];
+            }
+
+            if (technicalSpecs["Warranty"]) {
+                document.querySelector('[name="spec_battery_warranty"]').value =
+                    technicalSpecs["Warranty"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+        // APPLIANCES
+        if (['light', 'fan', 'pump'].includes(category)) {
+
+            if (technicalSpecs["Backup"]) {
+                document.querySelector('[name="spec_backup"]').value = technicalSpecs["Backup"];
+            }
+
+            if (technicalSpecs["Wattage"]) {
+                document.querySelector('[name="spec_wattage"]').value = technicalSpecs["Wattage"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+            if (technicalSpecs["Operating Voltage"]) {
+                document.querySelector('[name="spec_appliance_voltage"]').value =
+                    technicalSpecs["Operating Voltage"];
+            }
+
+            if (technicalSpecs["Application Area"]) {
+                document.querySelector('[name="spec_application"]').value =
+                    technicalSpecs["Application Area"];
+            }
+
+            if (technicalSpecs["Body Material"]) {
+                document.querySelector('[name="spec_body_material"]').value =
+                    technicalSpecs["Body Material"];
+            }
+        }
+        if (category === 'mppt') {
+
+            if (technicalSpecs["Max PV Voltage"]) {
+                document.querySelector('[name="spec_mppt_pv_voltage"]').value =
+                    technicalSpecs["Max PV Voltage"];
+            }
+
+            if (technicalSpecs["Charging Current"]) {
+                document.querySelector('[name="spec_mppt_current"]').value =
+                    technicalSpecs["Charging Current"];
+            }
+
+            if (technicalSpecs["Battery Type"]) {
+                document.querySelector('[name="spec_mppt_battery"]').value =
+                    technicalSpecs["Battery Type"];
+            }
+
+            if (technicalSpecs["Tracking Efficiency"]) {
+                document.querySelector('[name="spec_mppt_efficiency"]').value =
+                    technicalSpecs["Tracking Efficiency"];
+            }
+
+            if (technicalSpecs["Cooling"]) {
+                document.querySelector('[name="spec_mppt_cooling"]').value =
+                    technicalSpecs["Cooling"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+        if (category === 'protection') {
+
+            if (technicalSpecs["Protection Type"]) {
+                document.querySelector('[name="spec_protection_type"]').value =
+                    technicalSpecs["Protection Type"];
+            }
+
+            if (technicalSpecs["Rated Current"]) {
+                document.querySelector('[name="spec_protection_current"]').value =
+                    technicalSpecs["Rated Current"];
+            }
+
+            if (technicalSpecs["Voltage Rating"]) {
+                document.querySelector('[name="spec_protection_voltage"]').value =
+                    technicalSpecs["Voltage Rating"];
+            }
+
+            if (technicalSpecs["Poles"]) {
+                document.querySelector('[name="spec_protection_poles"]').value =
+                    technicalSpecs["Poles"];
+            }
+
+            if (technicalSpecs["IP Rating"]) {
+                document.querySelector('[name="spec_protection_ip"]').value =
+                    technicalSpecs["IP Rating"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+        if (category === 'structure') {
+
+            if (technicalSpecs["Material"]) {
+                document.querySelector('[name="spec_structure_material"]').value =
+                    technicalSpecs["Material"];
+            }
+
+            if (technicalSpecs["Mount Type"]) {
+                document.querySelector('[name="spec_structure_type"]').value =
+                    technicalSpecs["Mount Type"];
+            }
+
+            if (technicalSpecs["Wind Resistance"]) {
+                document.querySelector('[name="spec_structure_wind"]').value =
+                    technicalSpecs["Wind Resistance"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+        if (category === 'heater') {
+
+            if (technicalSpecs["Tank Capacity"]) {
+                document.querySelector('[name="spec_heater_capacity"]').value =
+                    technicalSpecs["Tank Capacity"];
+            }
+
+            if (technicalSpecs["Collector Type"]) {
+                document.querySelector('[name="spec_heater_collector"]').value =
+                    technicalSpecs["Collector Type"];
+            }
+
+            if (technicalSpecs["Tank Material"]) {
+                document.querySelector('[name="spec_heater_material"]').value =
+                    technicalSpecs["Tank Material"];
+            }
+
+            if (technicalSpecs["Insulation"]) {
+                document.querySelector('[name="spec_heater_insulation"]').value =
+                    technicalSpecs["Insulation"];
+            }
+
+            if (technicalSpecs["Max Temperature"]) {
+                document.querySelector('[name="spec_heater_temp"]').value =
+                    technicalSpecs["Max Temperature"];
+            }
+            if (technicalSpecs["Rating"]) {
+                document.querySelector('[name="rating"]').value =
+                    technicalSpecs["Rating"];
+            }
+        }
+    }
+};
+
+</script>
+</body>
+</html>

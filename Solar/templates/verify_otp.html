@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaynSolar | Verify OTP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --bg-top: #0a1128;
+            --bg-mid: #141824;
+            --bg-burgundy: #020617;
+            --bg-bottom: #020617;
+            --card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e6e8ee;
+            --muted: #9aa0b4;
+            --accent2-index: #06b6d4;
+            --btn-gradient: linear-gradient(135deg, #10b981, #06b6d4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, var(--bg-top) 0%, transparent 60%),
+                        linear-gradient(to bottom, var(--bg-bottom) 0%, var(--bg-burgundy) 35%, var(--bg-mid) 70%, var(--bg-bottom) 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 40px 35px;
+            width: 380px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        h2 { text-align: center; margin-bottom: 10px; font-size: 1.6rem; color: #ffffff; }
+        .sub-text { text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 25px; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--muted); }
+        .input-group input {
+            width: 100%; padding: 14px; border-radius: 12px;
+            background: rgba(2, 6, 23, 0.4); border: 1px solid var(--border);
+            color: #fff; font-size: 1.5rem; letter-spacing: 0.5rem; text-align: center;
+            transition: 0.25s;
+        }
+        .input-group input:focus { outline: none; border-color: var(--accent2-index); }
+
+        button {
+            width: 100%; padding: 14px; border: none; border-radius: 14px;
+            background: var(--btn-gradient); color: #022c22;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .alert { padding: 10px; border-radius: 8px; margin-bottom: 18px; text-align: center; font-size: 14px; }
+        .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+        .back-link {
+            display: block; text-align: center; margin-top: 25px;
+            font-size: 14px; color: var(--muted); text-decoration: none;
+        }
+        .back-link:hover { color: var(--accent2-index); text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Verify OTP</h2>
+    <p class="sub-text">Enter the 6-digit code sent to your email</p>
+
+    {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+    <form method="POST" action="{% url 'verify_otp' user_type %}">
+        {% csrf_token %}
+        <div class="input-group">
+            <label>Verification Code</label>
+            <input type="text" name="otp" maxlength="6" pattern="\d{6}" placeholder="000000" required>
+        </div>
+        <button type="submit">Verify & Continue</button>
+    </form>
+    <a href="{% if user_type == 'employee' %}{% url 'employee_login' %}{% else %}{% url 'user_login' %}{% endif %}" class="back-link">
+        ← Resend OTP / Back
+    </a>
+    
+</div>
+
+</body>
+</html>

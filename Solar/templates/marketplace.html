@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rayn Inventory | Rayn Solar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      /* MATCHED TO RAYN SOLAR SIGNATURE TONALITY */
+      --bg1: #300305;       /* Deep luxurious burgundy */
+      --bg2: #141824;       /* Twilight midnight blue */
+      --bg-mid: #0f111a;    /* Deep slate tone */
+      --card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6e8ee; 
+      --muted: #9aa0b4; 
+      --accent: #8b5cf6;     /* Vibrant purple signature accent */
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      /* Smooth mixed dark multi-gradient matching user home */
+      background: 
+        radial-gradient(circle at top, var(--bg2), transparent 55%),
+        linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 100%);
+      background-attachment: scroll;
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Breadcrumb Container Centering Alignment Fix */
+    .breadcrumb-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto 30px auto; /* Auto side margins balance layout positioning flawlessly */
+      align-self: center;       /* Centers container relative to body */
+    }
+
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    /* Base link styles - UPDATED TO 0.9rem FOR APP-WIDE CONSISTENCY */
+    .breadcrumb a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    /* Home link specific color (Realigned to Accent Purple) */
+    .breadcrumb a.home-link {
+      color: var(--accent);
+    }
+
+    .breadcrumb a:hover {
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .breadcrumb a.home-link:hover {
+      filter: brightness(1.2);
+      color: var(--accent);
+    }
+
+    /* Separator Icon */
+    .breadcrumb i.fa-chevron-right {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Current Page (Non-clickable) - UPDATED TO 0.9rem */
+    .breadcrumb span.current-page {
+      color: var(--muted);
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    /* Filter Navigation */
+    .filter-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 50px;
+      max-width: 1100px;
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      border-radius: 50px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-gradient);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .product-card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .product-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(139, 92, 246, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .product-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .price-tag {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 15px;
+    }
+
+    .tech-specs {
+      list-style: none;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .tech-specs li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      filter: brightness(0.9);
+      transition: 0.3s;
+    }
+
+    .buy-btn:hover { 
+      filter: brightness(1.1); 
+      transform: scale(1.02); 
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.25);
+    }
+
+    .no-products {
+      text-align: center;
+      padding: 100px;
+      color: var(--muted);
+    }
+
+    /* Floating Cart Button Styling */
+    .cart-floating-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: var(--accent-gradient);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cart-floating-btn:hover {
+      transform: scale(1.1) rotate(-5deg);
+      box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5);
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #fff;
+      color: #020617;
+      font-size: 0.75rem;
+      font-weight: 800;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg2);
+    }
+
+    /* Responsive adjustment for mobile */
+    @media (max-width: 768px) {
+      .cart-floating-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="{% url 'view_cart' %}" class="cart-floating-btn">
+    <i class="fas fa-shopping-cart"></i>
+  </a>
+
+  <div class="breadcrumb-wrapper">
+    <nav class="breadcrumb">
+      <a href="/user_home/" class="home-link">
+        <i class="fas fa-home"></i> Home
+      </a>
+      
+      <i class="fas fa-chevron-right"></i>
+      
+      <a href="{% url 'services' %}">Services</a>
+      
+      <i class="fas fa-chevron-right"></i>
+      
+      <span class="current-page">Rayn Inventory</span>
+    </nav>
+  </div>
+
+  <header style="text-align: center; margin-bottom: 40px;">
+    <h1 style="font-size: 2.5rem; background: linear-gradient(135deg, #ffffff, var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Rayn Inventory</h1>
+    <p style="color: var(--muted); margin-top: 5px;">Premium Solar Hardware & Efficient Appliances</p>
+  </header>
+
+  <nav class="filter-nav">
+    <a href="?" class="filter-btn {% if not selected_category %}active{% endif %}">All Products</a>
+    {% for key, val in categories %}
+      <a href="?category={{ key }}" class="filter-btn {% if selected_category == key %}active{% endif %}">
+        {{ val }}
+      </a>
+    {% endfor %}
+  </nav>
+
+  <div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+      {% else %}
+        <div class="product-img" style="display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-solar-panel fa-3x" style="color: var(--border);"></i>
+        </div>
+      {% endif %}
+      
+      <span class="brand-badge">{{ product.brand }}</span>
+      <h3>{{ product.name }}</h3>
+      <div class="price-tag">₹{{ product.price }}</div>
+
+      <ul class="tech-specs">
+        {% if product.efficiency %}
+          <li><span>Efficiency:</span> <span>{{ product.efficiency }}</span></li>
+        {% endif %}
+        {% if product.warranty_years %}
+          <li><span>Warranty:</span> <span>{{ product.warranty_years }} Years</span></li>
+        {% endif %}
+        
+        {% for key, value in product.technical_specs.items %}
+          {% if value and forloop.counter <= 3 %}
+            <li><span>{{ key }}:</span> <span>{{ value }}</span></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+
+      <a href="{% url 'product_detail' product.pk %}" style="text-decoration: none;">
+        <button class="buy-btn">View Details</button>
+      </a>
+    </div>
+    {% empty %}
+    <div class="no-products">
+      <i class="fas fa-box-open fa-3x" style="margin-bottom: 15px; display: block;"></i>
+      <p>No products found in this category.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</body>
+</html>

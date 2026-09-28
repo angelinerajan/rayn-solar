@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+:root {
+    /* REBALANCED THEME: Midnight Blue dominant, Burgundy only as deep subtle shadow */
+    --bg-primary: #141824;      /* Main base background */
+    --bg-deep-shadow: #250204;  /* Deep burgundy shadow (for gradient bottom only) */
+
+    --card: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e6e8ee;
+    --muted: #9aa0b4;
+    --accent: #8b5cf6;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    min-height: 100vh;
+    padding: 30px;
+    /* Rebalanced background: Midnight blue dominant, grounded by subtle deep warmth at the base */
+    background: 
+      radial-gradient(circle at top, #1e253a, transparent 60%),
+      linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-primary) 60%, var(--bg-deep-shadow) 100%);
+    background-attachment: fixed;
+    color: var(--text);
+  }
+
+  /* Updated Breadcrumb */
+  .breadcrumb {
+    position: absolute;
+    top: -45px; /* Sits just above the card */
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    transition: 0.3s;
+  }
+
+  .breadcrumb a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--accent);
+  }
+  
+  /* Messages */
+  .messages-container {
+    max-width: 900px;
+    margin: 0 auto 20px;
+  }
+
+  .message {
+    padding: 14px 18px;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  .message.success {
+    background-color: #16a34a; /* green */
+  }
+
+  .message.error {
+    background-color: #dc2626; /* red */
+  }
+
+  /* Profile Card */
+  /* Adjust Profile Container padding */
+  .profile-container {
+    max-width: 900px;
+    margin: 60px auto 20px; /* Increased top margin for space */
+    background: var(--card);
+    backdrop-filter: blur(14px);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    position: relative; /* CRITICAL: Enables absolute positioning for children */
+  }
+  /* Header */
+  .profile-header {
+    display: flex;
+    align-items: center;
+    padding: 34px 40px;
+    /* Neutralized header gradient to align with Midnight Blue */
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.01)
+    );
+    border-bottom: 1px solid var(--border);
+  }
+
+  .profile-header img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    margin-right: 30px;
+  }
+
+  .profile-header h2 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .profile-header p {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  /* Body */
+  .profile-body {
+    padding: 32px 40px 38px;
+  }
+
+  .profile-body h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+
+  .profile-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 40px;
+  }
+
+  .profile-details .detail label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .profile-details .detail span {
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  /* Profile action buttons */
+  .profile-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+  }
+
+  .profile-actions .btn-delete {
+    margin-left: auto; /* pushes delete button to the right */
+  }
+
+  /* Edit Button */
+  .btn-edit {
+    display: inline-block;
+    padding: 12px 26px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.35s ease;
+  }
+
+  .btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(139,92,246,0.35);
+  }
+
+  /* Delete Button */
+  .btn-delete {
+    padding: 12px 26px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #dc3545, #b91c1c);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.35s ease;
+  }
+
+  .btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(220,53,69,0.35);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .profile-details {
+      grid-template-columns: 1fr;
+    }
+
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .profile-header img {
+      margin: 0 0 18px;
+    }
+
+    /* Make buttons stack vertically on small screens */
+    .profile-actions {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .profile-actions .btn-delete {
+      margin-left: 0;
+      width: 100%;
+    }
+    .btn-edit {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  /* Profile picture hover */
+.profile-pic {
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.profile-pic:hover {
+  transform: scale(1.05);
+}
+
+/* Fullscreen image modal */
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+}
+
+.image-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Zoomable image */
+.image-modal img {
+  max-width: 92%;
+  max-height: 92%;
+  border-radius: 14px;
+  cursor: grab;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.image-modal img:active {
+  cursor: grabbing;
+}
+  </style>
+</head>
+<body>
+
+
+
+  <!-- Django Messages -->
+  {% if messages %}
+  <div class="messages-container">
+    {% for message in messages %}
+      <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="profile-container">
+      <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>Profile</span>
+  </div>
+    <!-- Header with Photo and Name -->
+    <div class="profile-header">
+      {% if user.photo %}
+        <img src="{{ user.photo.url }}"
+            alt="{{ user.full_name }}"
+            class="profile-pic"
+            onclick="openImageModal(this.src)">
+      {% else %}
+        <img src="https://via.placeholder.com/300"
+            class="profile-pic"
+            onclick="openImageModal(this.src)">
+      {% endif %}
+      <div>
+        <h2>{{ user.full_name }}</h2>
+        <p>{{ user.email }}</p>
+      </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-body">
+      <h3>Personal Information</h3>
+      <div class="profile-details">
+        <div class="detail">
+          <label>Phone Number</label>
+          <span>{{ user.phone_number }}</span>
+        </div>
+        <div class="detail">
+          <label>Street Address</label>
+          <span>{{ user.street_address }}</span>
+        </div>
+        <div class="detail">
+          <label>City</label>
+          <span>{{ user.city }}</span>
+        </div>
+        <div class="detail">
+          <label>State</label>
+          <span>{{ user.state }}</span>
+        </div>
+        <div class="detail">
+          <label>Pincode</label>
+          <span>{{ user.pincode }}</span>
+        </div>
+        <div class="detail">
+          <label>Country</label>
+          <span>{{ user.country }}</span>
+        </div>
+        <div class="detail">
+          <label>Account Created</label>
+          <span>{{ user.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="profile-actions">
+        <a href="/edit_user_profile/" class="btn-edit"><i class="fas fa-edit"></i> Edit Profile</a>
+        <a href="javascript:void(0);" class="btn-delete" onclick="confirmDelete()">
+          <i class="fas fa-trash"></i> Delete Account
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  function confirmDelete() {
+    const confirmed = confirm(
+      "⚠️ Are you sure you want to delete your account?\n\nThis action cannot be undone."
+    );
+
+    if (confirmed) {
+      alert("Your account will be deleted. You will be logged out.");
+      window.location.href = "/delete_user_account/";
+    }
+  }
+
+  </script>
+
+  <div id="imageModal" class="image-modal">
+  <img id="modalImg" src="">
+
+
+  <script>
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX, startY;
+
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImg");
+
+    function openImageModal(src) {
+      modal.classList.add("active");
+      modalImg.src = src;
+      resetTransform();
+    }
+
+    function closeImageModal() {
+      modal.classList.remove("active");
+    }
+
+    function resetTransform() {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+    }
+
+    function applyTransform() {
+      modalImg.style.transform =
+        `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    /* Scroll zoom */
+    modalImg.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      scale += e.deltaY * -0.0015;
+      scale = Math.min(Math.max(1, scale), 5);
+      applyTransform();
+    });
+
+    /* Mouse drag pan */
+    modalImg.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      applyTransform();
+    });
+
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    /* Close on background click */
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeImageModal();
+    });
+
+    /* ESC key close */
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeImageModal();
+    });
+    </script>
+
+ 
+
+</div>
+</body>
+</html>

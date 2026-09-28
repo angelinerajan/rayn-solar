@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rayn Solar | Smart Energy Platform</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+:root {
+  /* THEME REALIGNED TO MATCH USER PROFILE */
+  --bg1: #300305;       /* Deep luxurious burgundy */
+  --bg2: #141824;       /* Twilight midnight blue */
+  --bg-mid: #0f111a;    /* Deep slate tone to break up the middle portion's brightness */
+  --bg-bottom: #1e1b29; /* Slightly lighter, dim purple-tinted shade for the lower page blend */
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6e8ee;      /* Clean crisp text */
+  --muted: #9aa0b4;     /* Soft slate grey */
+  --accent: #8b5cf6;    /* Vibrant purple signature accent */
+  --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+}
+
+/* LIGHT MODE OVERRIDES FOR BACKWARD COMPATIBILITY */
+html.light {
+  --bg1: #f1f5f9;   
+  --bg2: #e2e8f0; 
+  --card: rgba(255, 255, 255, 0.8);
+  --border: rgba(15, 23, 42, 0.08);
+  --text: #0f172a;
+  --muted: #475569;
+  --accent: #7c3aed;  
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background: 
+    radial-gradient(circle at top, var(--bg2), transparent 55%),
+    linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 75%, var(--bg-bottom) 100%);
+  background-attachment: scroll;
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+}
+
+html.light body {
+  background: radial-gradient(circle at top, #ffffff, #cbd5e1);
+}
+
+#glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  background: radial-gradient(800px circle at var(--x) var(--y), rgba(139, 92, 246, 0.03), transparent 80%);
+  z-index: 1;
+}
+html.light #glow { display: none; }
+
+/* NAVBAR */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(20, 24, 36, 0.75);
+  border-bottom: 1px solid var(--border);
+}
+
+html.light .navbar {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px;
+}
+
+.nav-inner h2 {
+  background: linear-gradient(135deg, #e6e8ee, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.nav-links-wrapper {
+  display: flex; 
+  align-items: center;
+}
+
+.nav-inner a {
+  color: var(--muted);
+  margin-left: 22px;
+  text-decoration: none;
+  font-size: .95rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-inner a:hover { color: var(--text); }
+
+/* NEW DROPDOWN MENU ARCHITECTURE FOR PROFILE/LOGOUT */
+.profile-dropdown-container {
+  position: relative;
+  margin-left: 22px;
+  display: inline-block;
+}
+
+.profile-link {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-left: 0 !important; /* Managed by parent container wrapper */
+}
+
+.profile-link:hover {
+  border-color: var(--accent);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #141824;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 160px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+html.light .dropdown-menu {
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* Trigger reveal animations smoothly on wrapper hover */
+.profile-dropdown-container:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu a {
+  margin: 0 !important;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdown-menu a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+html.light .dropdown-menu a:hover {
+  background: #f1f5f9;
+}
+
+.logout-link {
+  color: #fca5a5 !important;
+  font-weight: 600;
+}
+.logout-link:hover {
+  color: #f87171 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* HERO */
+.hero {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content { max-width: 850px; }
+
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.2;
+  background: linear-gradient(120deg, #ffffff, #e6e8ee, var(--accent), #ffffff);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientMove 10s linear infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+
+.hero p {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.hero .cta {
+  margin-top: 38px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* BUTTONS WITH SLIGHTLY DIMMED BRIGHTNESS */
+.btn {
+  display: inline-block;
+  padding: 14px 36px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  background: var(--accent-gradient);
+  color: white;
+  filter: brightness(0.9);
+  transition: all 0.35s ease;
+  border: none;
+}
+
+.btn.secondary {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  filter: brightness(1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.25);
+}
+
+.btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  filter: brightness(1);
+}
+
+/* LIGHT MODE BUTTONS */
+html.light .btn {
+  background: var(--accent-gradient);
+  color: #ffffff;
+}
+
+html.light .btn.secondary {
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* SECTION */
+.section {
+  max-width: 1200px;
+  margin: 90px auto;
+  padding: 0 25px;
+  position: relative;
+  z-index: 2;
+}
+
+/* FEATURES */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.feature-card {
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 320px;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+
+html.light .feature-card:hover {
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+}
+
+.feature-card i {
+  font-size: 2.3rem;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, #ffffff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.feature-card h3 { 
+  margin-bottom: 12px; 
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.feature-card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* SPLIT MAPS */
+.split {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 60px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .split { grid-template-columns: 1fr; gap: 35px; }
+}
+
+.split .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 40px;
+  backdrop-filter: blur(14px);
+}
+
+.split .card h3 {
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.split .card p {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.split .card p i {
+  color: var(--accent);
+}
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.stat {
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 35px;
+  backdrop-filter: blur(14px);
+}
+
+.stat h2 {
+  font-size: 2.8rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #ffffff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 3D SOLAR PANEL */
+.panel-3d {
+  width: 160px;
+  height: 240px;
+  margin: 20px auto;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.12) 0,
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.12) 0,
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px,
+      transparent 30px
+    ),
+    linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, transparent 50%), 
+    linear-gradient(145deg, #1e1b4b, #111827, #030712); 
+  
+  border: 3px solid rgba(255, 255, 255, 0.2); 
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(139, 92, 246, 0.15), 
+    0 18px 45px rgba(0, 0, 0, 0.6);
+    
+  transform-style: preserve-3d;
+  transform: perspective(800px) rotateX(20deg) rotateY(0deg);
+  animation: rotatePanel 12s linear infinite;
+  transition: transform 0.8s ease;
+}
+
+html.light .panel-3d {
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.25) 0,
+      rgba(255, 255, 255, 0.25) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.25) 0,
+      rgba(255, 255, 255, 0.25) 1px,
+      transparent 1px,
+      transparent 30px
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
+    linear-gradient(145deg, #4f46e5, #3730a3, #1e1b4b);
+  border: 3px solid #94a3b8;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3), 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.panel-3d.sim-active { animation: none; }
+
+@keyframes rotatePanel {
+  from { transform: perspective(800px) rotateX(20deg) rotateY(0deg); }
+  to { transform: perspective(800px) rotateX(20deg) rotateY(360deg); }
+}
+
+/* BATTERY */
+.battery {
+  width: 120px;
+  height: 45px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  position: relative;
+  margin: 15px auto;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.battery::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 11px;
+  width: 6px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.battery-level {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-gradient);
+  transition: .4s;
+}
+
+/* RANGE INPUT */
+#angleSlider {
+  width: 100%;
+  margin: 15px 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+#angleSlider:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* FLOATING THEME TOGGLE */
+.floating-toggle {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--accent);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+.floating-toggle:hover {
+  transform: scale(1.08) rotate(12deg);
+  border-color: var(--accent);
+}
+
+/* Circular profile picture styling for navbar */
+.profile-pic-nav {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--accent);
+}
+
+/* FOOTER */
+.footer {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+/* Ensure the modal is hidden by default */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Changed from flex to none */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+/* This is applied by JavaScript */
+.modal-overlay.active {
+    display: flex;
+}
+
+/* Add some basic styling for the popup if missing */
+.browser-popup {
+    background: #141824;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+    max-width: 400px;
+    width: 90%;
+}
+/* Add this to your style block */
+.popup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* Style the buttons inside the popup to match your theme */
+.popup-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.popup-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.popup-btn.primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+}
+
+.popup-btn:hover {
+    filter: brightness(1.2);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="glow"></div>
+
+<div class="navbar">
+  <div class="nav-inner">
+    <h2>Rayn Solar</h2>
+    <div class="nav-links-wrapper">
+      <a href="/services/"><i class="fas fa-tools"></i> Services</a>
+      <a href="/installation_history/"><i class="fas fa-history"></i> Requests</a>
+      <a href="/cart/"><i class="fas fa-shopping-cart"></i> My cart</a>
+      <a href="/chatbot/"><i class="fas fa-comments"></i> Hi</a>
+      
+      <div class="profile-dropdown-container">
+        <a href="#" class="profile-link">
+          {% if user.photo %}
+            <img src="{{ user.photo.url }}" alt="Profile Picture" class="profile-pic-nav">
+          {% else %}
+            <i class="fas fa-user-circle" style="color: var(--accent); font-size: 1.1rem;"></i> 
+          {% endif %}
+          <span>{{ first_name|default:"Profile" }}</span>
+        </a>
+        
+        <div class="dropdown-menu">
+          <a href="/user_profile/"><i class="fas fa-user-cog" style="color: var(--muted);"></i> Account</a>
+          <a href="{% url 'logout' %}" id="logoutTrigger" class="logout-link">
+              <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Power Your Future with Smart Solar Energy</h1>
+    <p>Intelligent solar design, accurate cost estimation, and maximum energy savings — all in one integrated dashboard.</p>
+    <div class="cta">
+      <a href="/services/" class="btn">Start Solar Estimation</a>
+      <a href="#learn" class="btn secondary">Explore Platform</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="learn">
+  <h2 style="text-align: center; margin-bottom: 50px; font-weight: 500; letter-spacing: -0.5px; text-transform: uppercase; font-size: 1rem; color: var(--accent);">Why Our Solar Platform?</h2>
+  <div class="features">
+    <div class="feature-card">
+      <i class="fas fa-calculator"></i>
+      <h3>Solar Estimation</h3>
+      <p>Generate solar recommendations based on your energy requirements, including system size, panel count, project cost, and ROI projections.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-bolt"></i>
+      <h3>Solar Marketplace</h3>
+      <p>Browse and purchase solar panels, batteries, inverters, and other essential components through the integrated marketplace.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-solar-panel"></i>
+      <h3>Installation Management</h3>
+      <p>Track installation requests from submission to completion, including inspections, approvals, and scheduling.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="split">
+    <div>
+      <h2 style="font-weight: 500; letter-spacing: -0.5px; margin-bottom: 15px;">Everything You Need for Solar Adoption</h2>
+      <p style="margin-top: 15px; color: var(--muted);">
+        Rayn Solar combines intelligent estimation tools, product purchasing, installation lifecycle management, and AI-powered support to simplify the transition to solar energy.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-weight: 500; margin-bottom: 20px; text-transform: uppercase; font-size: 0.95rem; color: var(--accent);">How It Works</h3>
+      <p><i class="fas fa-check-circle"></i> Estimate Your Requirements</p>
+      <p><i class="fas fa-check-circle"></i> Purchase & Request Installation</p>
+      <p><i class="fas fa-check-circle"></i> Track Progress & Complete Payment</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="stats">
+    <div class="stat">
+        <h2>Estimate</h2>
+        <p style="color: var(--muted); margin-top: 5px;">Solar System Planning</p>
+    </div>
+
+    <div class="stat">
+        <h2>Shop</h2>
+        <p style="color: var(--muted); margin-top: 5px;">Integrated Marketplace</p>
+    </div>
+
+    <div class="stat">
+        <h2>Track</h2>
+        <p style="color: var(--muted); margin-top: 5px;">Installation Progress</p>
+    </div>
+
+    <div class="stat">
+        <h2>Ray</h2>
+        <p style="color: var(--muted); margin-top: 5px;">AI-Powered Assistance</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="text-align: center;">
+  <h2 style="font-weight: 500; letter-spacing: -0.5px; margin-bottom: 15px;">Start Your Solar Journey Today</h2>
+  <p style="margin-top: 15px; color: var(--muted); max-width: 600px; margin-left: auto; margin-right: auto;">
+    Estimate your solar requirements, explore hardware products, track installation requests, and get instant support through Ray.
+  </p>
+  <div style="margin-top: 30px;">
+    <a href="/services/" class="btn">Get Started</a>
+  </div>
+</section>
+
+<section class="section">
+  <h2 style="text-align: center; margin-bottom: 40px; font-weight: 500; letter-spacing: -0.5px; text-transform: uppercase; font-size: 1rem; color: var(--accent);">Smart Solar Simulation Lab</h2>
+  <div style="text-align: center; margin-bottom: 40px;">
+    <button class="btn" id="simBtn" onclick="toggleSimulation()">Start Simulation</button>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <h3>3D Solar Panel View</h3>
+      <div class="panel-3d"></div>
+      <p>Realistic rotating solar panel visualization.</p>
+    </div>
+
+    <div class="feature-card" style="justify-content: center; gap: 15px;">
+      <h3>Live Energy Production</h3>
+      <h2 style="font-size: 3rem; background: linear-gradient(135deg, #ffffff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent;"><span id="kw">0</span> kW</h2>
+      <p>Simulated real-time solar power generation.</p>
+    </div>
+
+    <div class="feature-card" style="justify-content: center; gap: 10px;">
+      <h3>Battery Charging</h3>
+      <div class="battery">
+        <div class="battery-level" id="batteryLevel"></div>
+      </div>
+      <p style="font-weight: 500; color: var(--text);"><span id="batteryPercent">0</span>% Charged</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Solar Angle Simulator</h3>
+      <input type="range" min="0" max="90" value="30" id="angleSlider" disabled>
+      <p style="margin-top: 10px;">Panel Tilt: <span id="angleVal">30</span>°</p>
+      <p>Efficiency: <span id="efficiency">78</span>%</p>
+    </div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="logoutModal">
+    <div class="browser-popup">
+        <h3 style="margin-bottom: 15px;">Confirm Logout</h3>
+        <p style="color: var(--muted);">Are you sure you want to logout of your Rayn Solar account?</p>
+        <div class="popup-actions">
+            <button class="popup-btn secondary" onclick="closeLogoutModal()">Cancel</button>
+            <button class="popup-btn primary" onclick="confirmLogout()">Confirm Logout</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let maxCapacity = 8;
+let battery = 40;
+let simulationRunning = false;
+
+const slider = document.getElementById("angleSlider");
+const angleVal = document.getElementById("angleVal");
+const eff = document.getElementById("efficiency");
+const kwDisplay = document.getElementById("kw");
+const batteryLevel = document.getElementById("batteryLevel");
+const batteryPercent = document.getElementById("batteryPercent");
+const panel = document.querySelector(".panel-3d");
+
+document.addEventListener('mousemove', (e) => {
+  document.documentElement.style.setProperty('--x', e.clientX + 'px');
+  document.documentElement.style.setProperty('--y', e.clientY + 'px');
+});
+
+function solarSimulationEngine(){
+  if(!simulationRunning) return;
+
+  let angle = parseInt(slider.value);
+  angleVal.innerText = angle;
+
+  let efficiency = Math.max(35, 100 - angle * 0.9);
+  eff.innerText = efficiency.toFixed(1);
+
+  let power = (efficiency / 100) * maxCapacity;
+  kwDisplay.innerText = power.toFixed(2);
+
+  let batteryIncrement = power * 0.12;
+  battery += batteryIncrement;
+  if(battery > 100) battery = 100;
+
+  batteryLevel.style.width = battery + "%";
+  batteryPercent.innerText = Math.round(battery);
+
+  panel.style.transform = `perspective(900px) rotateX(${20 + angle/2}deg) rotateY(0deg)`;
+}
+
+setInterval(solarSimulationEngine, 900);
+
+slider.addEventListener("input", ()=>{
+  if(simulationRunning) solarSimulationEngine();
+});
+
+function toggleSimulation(){
+  simulationRunning = !simulationRunning;
+  const btn = document.getElementById("simBtn");
+  
+  slider.disabled = !simulationRunning;
+
+  if(simulationRunning){
+    btn.innerText = "Stop Simulation";
+    btn.style.background = "rgba(239, 68, 68, 0.15)";
+    btn.style.border = "1px solid rgba(239, 68, 68, 0.35)";
+    btn.style.color = "#fca5a5";
+    btn.style.boxShadow = "0 8px 20px rgba(239, 68, 68, 0.15)";
+    btn.style.filter = "brightness(1)";
+    panel.classList.add("sim-active"); 
+    solarSimulationEngine();
+  } else {
+    btn.innerText = "Start Simulation";
+    btn.style.background = ""; 
+    btn.style.border = "";
+    btn.style.color = "";
+    btn.style.boxShadow = "";
+    btn.style.filter = "";
+    panel.classList.remove("sim-active"); 
+    panel.style.transform = "perspective(800px) rotateX(20deg) rotateY(0deg)";
+  }
+}
+
+function toggleTheme(){
+  document.documentElement.classList.toggle("light");
+  const icon = document.getElementById("themeIcon");
+  icon.classList.toggle("fa-sun");
+  icon.classList.toggle("fa-moon");
+}
+</script>
+
+<script>
+    // Ensure the DOM is fully loaded before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', function(e) {
+                e.preventDefault(); 
+                logoutModal.classList.add('active'); 
+            });
+        }
+    });
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').classList.remove('active');
+    }
+
+    function confirmLogout() {
+        // This triggers the Django view that performs request.session.flush()
+        window.location.href = "{% url 'logout' %}";
+    }
+</script>
+
+<div class="footer">
+  <p>&copy; 2026 RaynSolar — Smart Energy for Smart Living</p>
+  <p>Contact Us: rayn.solar2026@gmail.com</p>
+</div>
+<div class="floating-toggle" onclick="toggleTheme()" title="Toggle Theme">
+  <i class="fas fa-moon" id="themeIcon"></i>
+</div>
+
+</body>
+</html>

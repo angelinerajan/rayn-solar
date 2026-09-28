@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Rayn Solar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+        /* Base Setup Styles */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            display: flex; 
+            min-height: 100vh; 
+            background: #f8fafc; /* Crisp, clean modern workspace grey */
+        }
+        
+        /* UPDATED: Left Admin Sidebar Layout */
+        .sidebar { 
+            width: 240px; 
+            background: #0f172a; /* Sophisticated deep slate blue */
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .sidebar h2 { 
+            padding: 24px 20px; 
+            text-align: center; 
+            font-size: 1.25rem; 
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
+            margin: 0;
+        }
+        .sidebar a { 
+            padding: 14px 24px; 
+            color: #94a3b8; /* Muted slate gray for standard options */
+            text-decoration: none; 
+            border-left: 4px solid transparent;
+            transition: all 0.25s ease; 
+            cursor: pointer; 
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .sidebar a:hover { 
+            background: rgba(255, 255, 255, 0.03); 
+            color: #ffffff;
+        }
+        /* Solar Accent Styling for Current Panel Active Tab */
+        /* .sidebar a.active, .sidebar a[aria-selected="true"] {
+            background: rgba(243, 156, 18, 0.08);
+            color: #f39c12 !important; Rayn Solar warm yellow gold */
+            /* border-left-color: #f39c12;
+            font-weight: 600;
+        } */
+
+        /* UPDATED: Top Section & Workspace Wrapper */
+        .main { 
+            flex: 1; 
+            padding: 35px 40px; 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Ensure this is a soft gray */
+        }
+        .welcome-heading {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+        .welcome-subtext {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: -4px;
+        }
+
+        /* UPDATED: Responsive grid container for metrics at the top */
+        .cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
+
+        /* UPDATED: Individual card aesthetics */
+        .card-box { 
+            background: white; 
+            padding: 24px 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+            border: 1px solid #eef2f5; 
+            border-left: 5px solid #4e73df; /* Dynamic brand accent for overall tiles */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+        }
+        .card-box h4 { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            color: #858796; 
+            margin-bottom: 10px; 
+            font-weight: 700;
+        }
+        .card-box p { 
+            font-size: 32px; 
+            font-weight: bold; 
+            margin: 0; 
+            color: #2c3e50; 
+        }
+
+        /* UPDATED: Reusable Card-Style Table Aesthetics (Applies to Requests, Employees, and Products) */
+        .card-style-panel .table {
+            border-collapse: separate !important;
+            border-spacing: 0 12px !important;
+            background: transparent !important; /* Removes default box backing */
+        }
+        .card-style-panel .table-responsive {
+            background: transparent !important; /* Overrides the white box backing */
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        .card-style-panel tbody tr {
+            background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-style-panel tbody tr:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .card-style-panel tbody td {
+            border-top: 1px solid #eef2f5;
+            border-bottom: 1px solid #eef2f5;
+            background-color: #ffffff;
+            padding: 16px 12px !important; /* Consistent elegant spacing */
+        }
+        .card-style-panel tbody tr td:first-child {
+            border-left: 1px solid #eef2f5;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            padding-left: 20px !important;
+        }
+        .card-style-panel tbody tr td:last-child {
+            border-right: 1px solid #eef2f5;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding-right: 20px !important;
+        }
+
+        /* Header structural normalization for floating card layouts */
+        .card-style-panel .table thead tr th {
+            border: none !important;
+            padding-bottom: 4px !important;
+            color: #1e293b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        .card-style-panel .table thead tr th:first-child { padding-left: 20px !important; }
+        .card-style-panel .table thead tr th:last-child { padding-right: 20px !important; }
+
+
+        /* NEW STYLING: Content Controls (Second Pic Tab Bar Updates) */
+        .nav-tabs.custom-admin-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            gap: 8px;
+        }
+        .nav-tabs.custom-admin-tabs .nav-item .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.2s ease;
+            position: relative;
+            background: transparent;
+        }
+        .nav-tabs.custom-admin-tabs .nav-item .nav-link:hover {
+            color: #0f172a;
+            background: #f1f5f9;
+        }
+        .nav-tabs.custom-admin-tabs .nav-item .nav-link.active {
+            color: #0f172a;
+            background: transparent;
+        }
+        .nav-tabs.custom-admin-tabs .nav-item .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #0f172a; /* Clean modern matching dark line indicators */
+            border-radius: 3px;
+        }
+
+        /* NEW STYLING: Dynamic Filter and Form Standardizations */
+        .filter-search-group {
+            background: #ffffff;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
+        }
+        .filter-search-group .form-control {
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .filter-search-group .form-control:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+        }
+        .filter-search-group .input-group-text {
+            border: 1px solid #cbd5e1;
+            border-right: none;
+        }
+        .filter-search-group .form-control-with-icon {
+            border-left: none;
+        }
+
+        .table-responsive { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
+        }
+
+        /* UPDATED: Installation Requests Separated Row Aesthetics */
+        #install-panel .table {
+            border-collapse: separate !important;
+            border-spacing: 0 12px !important;
+        }
+        #install-panel tbody tr {
+            background-color: #ffffff;
+        }
+        #install-panel tbody td {
+            border-top: 1px solid #eef2f5;
+            border-bottom: 1px solid #eef2f5;
+            background-color: #ffffff;
+        }
+        #install-panel tbody tr td:first-child {
+            border-left: 1px solid #eef2f5;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+        #install-panel tbody tr td:last-child {
+            border-right: 1px solid #eef2f5;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        #install-panel .btn-sm {
+            min-width: 90px; /* Ensures 'Approve' and 'Reject' are the same width */
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Rejection Modal Enhancements */
+        #rejectModal .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+        #rejection_display_section {
+            background-color: #fff5f5 !important; /* Extremely soft red tint */
+            border: 1px solid #feb2b2 !important;
+            border-radius: 10px;
+        }
+        #current_reason_text {
+            font-size: 0.95rem;
+            color: #4a5568;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        #rejectModal .form-control {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+        #rejectModal .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+            border-color: #dc3545;
+        }
+
+        .italic-reason {
+            font-style: italic;
+            color: #718096;
+        }
+
+        /* Styling for the inline edit button */
+        .btn-edit-inline {
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            color: #6c757d; /* Muted gray */
+            background-color: transparent;
+            border: none;
+            transition: all 0.2s ease-in-out;
+            border-radius: 4px;
+        }
+        /* Hover effect: Light blue background and blue icon */
+        .btn-edit-inline:hover {
+            color: #104641;
+            background-color: #e7f1ff;
+        }
+        /* Only show the pencil when the row is hovered */
+        .stock-wrapper .btn-edit-inline {
+            opacity: 0.3;
+        }
+        tr:hover .stock-wrapper .btn-edit-inline {
+            opacity: 1;
+        }
+
+        /* Clean up the number input to remove arrows in some browsers */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        /* Style for the info icon button */
+        .btn-link.text-info {
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+            color: #94a3b8 !important; /* Changes base color to a clean slate gray */
+        }
+        .btn-link.text-info:hover {
+            transform: scale(1.2);
+            color: #f39c12 !important; /* Changes to Rayn Solar gold on hover */
+        }
+
+        /* Ensure the strong text and icon align nicely */
+        .d-flex.align-items-center strong {
+            line-height: 1.2;
+        }
+
+        /* Extra Micro Utilities for Typography & Images */
+        .extra-small {
+            font-size: 0.7rem;
+            letter-spacing: 0.3px;
+        }
+        .italic {
+            font-style: italic;
+        }
+        .object-fit-cover {
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Rayn Solar</h2>
+    <a data-bs-toggle="tab" >
+        <i class="fas fa-users me-2"></i> Users
+    </a>
+    <a data-bs-toggle="tab" >
+        <i class="fas fa-user-tie me-2"></i> Employees
+    </a>
+    <a data-bs-toggle="tab" >
+        <i class="fas fa-tools me-2"></i> Installation Requests
+    </a>
+    <a data-bs-toggle="tab" >
+        <i class="fas fa-boxes me-2"></i> Products Inventory
+    </a>
+    <a href="#" id="logoutTrigger" class="mt-auto border-0 text-danger" style="background: rgba(220, 53, 69, 0.05);">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</div>
+
+<div class="main">
+    <div class="mb-4">
+        <h1 class="welcome-heading">Welcome, Admin</h1>
+        <div class="welcome-subtext">Monitor solar metrics, look up operations status, and clean system assets.</div>
+    </div>
+
+    <div class="cards">
+        <div class="card-box" style="border-left: 5px solid #1a363b;"><h4>Total Users</h4><p>{{ users|length }}</p></div>
+        <div class="card-box" style="border-left: 5px solid #0a2f36;"><h4>Total Employees</h4><p>{{ employees|length }}</p></div>
+        <div class="card-box" style="border-left: 5px solid #23444b;"><h4>Active Requests</h4><p>{{ active_count }}</p></div>
+    </div>
+
+    <ul class="nav nav-tabs mb-4 custom-admin-tabs" id="adminTabList" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="tab-users" data-bs-toggle="tab" data-bs-target="#users-panel" type="button" role="tab">Users</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="tab-employees" data-bs-toggle="tab" data-bs-target="#employees-panel" type="button" role="tab">Employees</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="tab-install" data-bs-toggle="tab" data-bs-target="#install-panel" type="button" role="tab">Installation Requests</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="tab-products" data-bs-toggle="tab" data-bs-target="#products-panel" type="button" role="tab">Products</button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="users-panel">
+            
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 >User Management</h3>
+                    
+                    <form method="GET" action="" class="d-flex gap-2">
+                    <div class="input-group input-group-sm" style="width: 280px;">
+                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="user_search" class="form-control form-control-with-icon" placeholder="Search by Name, ID, or Email" value="{{ request.GET.user_search }}">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-dark px-3">Search</button>
+                    {% if request.GET.user_search %}
+                        <a href="?" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </form>
+                </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th> <th>Location</th> <th>Joined On</th> </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>#{{ u.id }}</td>
+                            <td>
+                                <img src="{% if u.photo %}{{ u.photo.url }}{% else %}https://via.placeholder.com/50{% endif %}" 
+                                    width="45" height="45" class="rounded-circle shadow-sm">
+                            </td>
+                            <td><strong>{{ u.full_name }}</strong></td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.phone_number }}</td> <td>{{ u.city }}, {{ u.state }}</td> <td>{{ u.created_at|date:"d M Y" }}</td> </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+       <div class="tab-pane fade" id="employees-panel">
+    <div class="filter-search-group d-flex justify-content-between align-items-center mb-4">
+        <h3 class="h5 mb-0 text-dark fw-bold">Employee Management</h3>
+        <form method="GET" action="" class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="width: 280px;">
+                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" name="employee_search" class="form-control form-control-with-icon" placeholder="Search by Name, Dept, or Designation" value="{{ request.GET.employee_search }}">
+            </div>
+            <button type="submit" class="btn btn-sm btn-dark px-3">Search</button>
+            {% if request.GET.employee_search %}
+                <a href="?" class="btn btn-sm btn-outline-secondary">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Dept</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in employees %}
+                <tr>
+                    <td>#{{ e.id }}</td>
+                    <td>
+                        <img src="{% if e.photo %}{{ e.photo.url }}{% else %}https://via.placeholder.com/45{% endif %}" 
+                             width="40" height="40" class="rounded-circle shadow-sm object-fit-cover">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <strong>{{ e.full_name }}</strong>
+                            <button type="button" class="btn btn-link text-info p-0 btn-view-employee" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#employeeDetailsModal"
+                                    data-id="{{ e.id }}"
+                                    data-name="{{ e.full_name }}"
+                                    data-email="{{ e.email }}"
+                                    data-phone="{{ e.phone_number }}"
+                                    data-dept="{{ e.department }}"
+                                    data-designation="{{ e.designation }}"
+                                    data-address="{% if e.address %}{{ e.address }}{% else %}Not Provided{% endif %}"
+                                    data-joined="{{ e.created_at|date:'d M Y' }}"
+                                    data-photo="{% if e.photo %}{{ e.photo.url }}{% else %}https://via.placeholder.com/100{% endif %}">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>{{ e.department }}</td>
+                    <td>{{ e.email }}</td>
+                    <td>
+                        <span class="badge {% if e.is_active %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                            {{ e.is_active|yesno:"Active,Pending" }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'approve_employee' e.id %}" class="btn btn-sm {% if e.is_active %}btn-outline-danger{% else %}btn-success{% endif %}" style="min-width: 95px;">
+                            {{ e.is_active|yesno:"Deactivate,Approve" }}
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No employees found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="employeeDetailsModal" tabindex="-1" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white py-3">
+                <h5 class="modal-title" id="employeeDetailsModalLabel fw-bold">Employee Profile Card</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <img id="emp-modal-photo" src="" alt="Profile Photo" class="rounded-circle shadow-sm mb-2 object-fit-cover" style="width: 90px; height: 90px; border: 3px solid #f1f5f9;">
+                    <h4 class="h5 mb-0 fw-bold text-dark" id="emp-modal-name"></h4>
+                    <span class="badge bg-secondary extra-small px-2 py-1 mt-1" id="emp-modal-designation"></span>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="text-muted extra-small text-uppercase fw-bold">Employee ID</label>
+                        <div class="fw-semibold text-dark" id="emp-modal-id"></div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted extra-small text-uppercase fw-bold">Department</label>
+                        <div class="fw-semibold text-dark" id="emp-modal-dept"></div>
+                    </div>
+                    <div class="col-12"><hr class="my-1 text-black-50"></div>
+                    <div class="col-12">
+                        <label class="text-muted extra-small text-uppercase fw-bold"><i class="fas fa-envelope me-1"></i> Email Address</label>
+                        <div class="text-dark" id="emp-modal-email"></div>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted extra-small text-uppercase fw-bold"><i class="fas fa-phone me-1"></i> Contact Number</label>
+                        <div class="text-dark" id="emp-modal-phone"></div>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted extra-small text-uppercase fw-bold"><i class="fas fa-map-marker-alt me-1"></i> Residential Address</label>
+                        <div class="text-dark" id="emp-modal-address"></div>
+                    </div>
+                    <div class="col-12"><hr class="my-1 text-black-50"></div>
+                    <div class="col-12 text-end">
+                        <span class="text-muted extra-small italic">Registered on: <span id="emp-modal-joined"></span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-pane fade" id="install-panel">
+    <h3>Requests Management</h3>
+    <div class="table-responsive" style="border: none;">
+        <table class="table align-middle" style="border-collapse: separate; border-spacing: 0 12px; table-layout: fixed; width: 100%;">
+            <thead>
+                <tr class="text-secondary small text-uppercase">
+                    <th class="ps-4" style="width: 30%;">Client & System</th>
+                    <th style="width: 20%;">Date Details</th>
+                    <th style="width: 20%;">Current Status</th>
+                    <th class="text-center" style="width: 30%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in installation_requests %}
+                <tr id="request-row-{{ r.id }}" class="bg-white shadow-sm {% if r.is_deleted %}opacity-50{% endif %}" style="border-radius: 12px;">
+                    <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-bold text-truncate">{{ r.user.full_name }}</span>
+                            <button class="btn btn-sm btn-outline-secondary p-0 border-0" 
+                                    style="font-size: 0.85rem; line-height: 1;"
+                                    onclick="showInfo('{{ r.user.full_name }}', '{{ r.system_size }}', '{{ r.panels_count }}', '{{ r.get_equipment_source_display }}', '{{ r.address|escapejs }}', '{{ r.additional_notes|escapejs }}', '{% if r.site_photos %}{{ r.site_photos.url }}{% endif %}')"
+                                    title="View Details">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted extra-small bg-light px-1 rounded">ID: #{{ r.user.id }}</span>
+                            <span class="text-muted small">{{ r.system_size }} kW</span>
+                        </div>
+                    </td>
+                    
+                    <td>
+                        <div class="d-flex flex-column">
+                            <!-- Investigation Date -->
+                            <div class="small">
+                                <span class="text-muted">Investigation:</span> 
+                                <span class="{% if r.is_deleted %}text-decoration-line-through{% endif %}">{{ r.preferred_date }}</span>
+                            </div>
+                            
+                            <!-- Installation Date -->
+                            {% if r.installation_date %}
+                            <div class="small">
+                                <span class="">Installation:</span> 
+                                <span class="fw-bold">{{ r.installation_date }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if not r.is_deleted and r.status != 'completed' and r.status != 'rejected' %}
+                                <button class="btn btn-link btn-sm p-0 text-muted mt-1" 
+                                    style="text-align: left; font-size: 0.75rem;"
+                                    data-bs-toggle="modal" data-bs-target="#dateModal" 
+                                    data-requestid="{{ r.id }}" 
+                                    data-currentdate="{% if r.installation_date %}{{ r.installation_date|date:'Y-m-d' }}{% else %}{{ r.preferred_date|date:'Y-m-d' }}{% endif %}" 
+                                    data-mode="reschedule">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="width: 20%;">
+                        <span class="badge rounded-pill px-3 
+                            {% if r.is_deleted %}bg-light text-muted border
+                            {% elif r.status == 'completed' %}bg-success-subtle text-success
+                            {% elif r.status == 'rejected' %}bg-danger-subtle text-danger
+                            {% elif r.status == 'approved' %}bg-primary-subtle text-primary
+                            {% else %}bg-info-subtle text-info{% endif %}">
+                            {{ r.get_status_display }}
+                        </span>
+                        
+
+                           {% if r.status == 'rejected' %}
+                                <div class="mt-1 d-flex align-items-center">
+                                    <small class="text-danger italic" style="font-size: 0.75rem;">
+                                        {% if r.admin_feedback %}
+                                            <strong>Reason:</strong> {{ r.admin_feedback|truncatechars:100 }}
+                                        {% else %}
+                                            <span class="text-muted">Reason for rejection has not been entered</span>
+                                        {% endif %}
+                                    </small>
+
+                                    <button class="btn btn-sm btn-outline-danger p-0 border-0 ms-1" 
+                                            style="font-size: 0.85rem; line-height: 1;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#rejectModal" 
+                                            data-requestid="{{ r.id }}" 
+                                            data-feedback="{{ r.admin_feedback|escapejs }}"
+                                            title="View/Edit Rejection Reason">
+                                        <i class="fas fa-{% if r.admin_feedback %}exclamation-circle{% else %}plus-circle{% endif %}"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                            
+                        
+
+                        {% if r.assignments.exists %}
+                        <div class="mt-2">
+                            <span class="badge bg-dark" 
+                                style="font-size: 0.7rem; cursor: pointer;" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#staffList-{{ r.id }}">
+                                <i class="fas fa-user-check me-1"></i> Assigned <i class="fas fa-chevron-down ms-1" style="font-size: 0.5rem;"></i>
+                            </span>
+
+                            <div class="collapse" id="staffList-{{ r.id }}">
+                                <div class="card card-body p-2 mt-2 border-0 shadow-sm bg-light" style="font-size: 0.75rem; min-width: 150px;">
+                                    <ul class="list-unstyled mb-0">
+                                        {% for assignment in r.assignments.all %}
+                                            {# Show investigation staff if the request is still in investigation OR if it's the only assignment type #}
+                                            {# Show installation staff once the project has moved past the investigation phase #}
+                                            
+                                            <li class="d-flex justify-content-between align-items-center mb-1 border-bottom pb-1">
+                                                <span>
+                                                    <small class="text-muted">#{{ assignment.employee.id }}</small> 
+                                                    <strong>{{ assignment.employee.full_name }}</strong>
+                                                    <br><small class="text-secondary" style="font-size: 0.6rem;">{{ assignment.get_work_type_display }}</small>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    {% if assignment.is_completed %}
+                                                        <button class="btn p-0 border-0 text-info" 
+                                                                style="font-size: 0.85rem;"
+                                                                onclick="viewProofReport('{{ assignment.employee.full_name|escapejs }}', '{{ assignment.get_work_type_display }}', '{{ assignment.report_text|escapejs }}', '{% if assignment.proof_file %}{{ assignment.proof_file.url }}{% endif %}')"
+                                                                title="View Submitted Report">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <i class="fas fa-check-circle text-success" title="Finished: {{ assignment.completed_at|date:'M d, H:i' }}"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-clock text-warning" title="Pending"></i>
+                                                    {% endif %}
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                    </td>
+
+                    <td class="py-3">
+                        <div class="d-flex justify-content-center align-items-center gap-2" style="min-height: 32px;">
+                            {% if not r.is_deleted %}
+                                {% if r.status == 'pending' %}
+                                    <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#dateModal" data-requestid="{{ r.id }}" data-mode="investigation">Schedule</button>
+                                
+                                {% elif r.status == 'investigation_scheduled' %}
+                                    <div class="d-flex flex-column gap-2 align-items-center">
+                                        {% if r.assignments.exists %}
+                                            {% if r.assignments.first.is_completed %}
+                                                <div class="btn-group gap-2">
+                                                    <button class="btn btn-sm btn-success rounded-pill px-3" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#dateModal" 
+                                                            data-requestid="{{ r.id }}" 
+                                                            data-mode="approve_with_date">
+                                                        Approve
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#rejectModal" data-requestid="{{ r.id }}">Reject</button>
+                                                </div>
+                                            {% else %}
+                                                <span class="badge bg-secondary rounded-pill px-3"><i class="fas fa-clock me-1"></i> Awaiting Staff</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <button class="btn btn-sm btn-warning rounded-pill px-3 w-100 mb-1" 
+                                                    data-bs-toggle="modal" data-bs-target="#assignModal" 
+                                                    data-requestid="{{ r.id }}" data-status="{{ r.status }}">
+                                                <i class="fas fa-user-plus me-1"></i> Assign Staff
+                                            </button>
+                                            <div class="btn-group gap-2">
+                                                <a href="{% url 'manage_installation_request' pk=r.id status='approved' %}" class="btn btn-sm btn-success rounded-pill px-3">Approve</a>
+                                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#rejectModal" data-requestid="{{ r.id }}">Reject</button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                {% elif r.status == 'approved' %}
+                                    <div class="d-flex flex-column gap-1 align-items-center">
+                                        <button class="btn btn-sm btn-warning rounded-pill px-3 shadow-sm mb-1" 
+                                                data-bs-toggle="modal" data-bs-target="#assignModal" 
+                                                data-requestid="{{ r.id }}" data-status="{{ r.status }}">
+                                            <i class="fas fa-user-plus me-1"></i> Assign
+                                        </button>
+
+                                        {% if r.assignments.first.is_completed %}
+                                            <a href="{% url 'manage_installation_request' pk=r.id status='completed' %}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">Confirm & Close</a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.65rem;" disabled>Awaiting Staff</button>
+                                        {% endif %}
+                                    </div>
+                                {% elif r.status == 'completed' %}
+
+                                    <div class="d-flex flex-column gap-2 align-items-center">
+                                        {% if r.installationpayment.status == 'paid' %}
+                                            <!-- Case 1: Payment is already done - Styled as requested -->
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-check-circle me-1"></i> Finalized
+                                                </span>
+                                                
+                                               <button 
+                                                class="btn p-0 d-flex align-items-center justify-content-center"
+                                                style="
+                                                    width: 18px;
+                                                    height: 18px;
+                                                    border-radius: 50%;
+                                                    background-color: #65978f; color: #000;
+                                                    font-size: 0.6rem;
+                                                "
+                                                onclick="showTimeline('{{ r.user.full_name|escapejs }}', '{{ r.preferred_date }}', '{{ r.installation_date }}', '{{ r.installation_amount }}','{{ r.installationpayment.paid_at }}')"
+                                                title="View Project Dates"
+                                            >
+                                                <i class="fas fa-exclamation"></i>
+                                            </button>
+                                                    
+                                            </div>
+                                        {% else %}
+                                            <!-- Case 2: Payment not paid, show Enter or Edit -->
+                                            <button 
+                                                class="btn btn-sm {% if r.installation_amount %}btn-outline-primary{% else %}btn-warning text-dark{% endif %} rounded-pill px-3 shadow-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#amountModal"
+                                                data-requestid="{{ r.id }}"
+                                                data-currentamount="{{ r.installation_amount|default:'' }}"
+                                            >
+                                                {% if r.installation_amount %}
+                                                    <i class="fas fa-pen me-1"></i> Update Amount
+                                                {% else %}
+                                                    <i class="fas fa- me-1"></i> Set Payment Amount
+                                                {% endif %}
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small"><i class="fas fa-check-circle me-1"></i>Finalized</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted small italic"><i class="fas fa-lock me-1"></i>Record Locked</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center py-4">No installation requests found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<div class="tab-pane fade" id="products-panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Inventory Management</h3>
+        <a href="{% url 'add_product' %}" class="btn btn-outline-dark btn-sm d-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i> Add Product
+        </a>
+    </div>
+
+    <div class="card border-0 bg-light p-3 mb-4 rounded-3 shadow-sm">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="filterBrand" class="form-control form-control-sm border-start-0" 
+                           placeholder="Search by Brand Name..." onkeyup="filterInventoryTable()">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select id="filterUtilityGroup" class="form-select form-select-sm" onchange="filterInventoryTable()">
+                    <option value="">All Utility Groups</option>
+                    <option value="infra">Installation Components</option>
+                    <option value="appliance">Solar Appliances</option>
+                    <option value="other">Other Products</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="filterCategory" class="form-select form-select-sm" onchange="filterInventoryTable()">
+                    <option value="">All Categories</option>
+                    <option value="Solar Panel" data-group="infra">Solar Panel</option>
+                    <option value="Inverter" data-group="infra">Inverter</option>
+                    <option value="Battery" data-group="infra">Battery</option>
+                    <option value="MPPT Charger" data-group="infra">MPPT Charger</option>
+                    <option value="Protection Devices" data-group="infra">Protection Devices</option>
+                    <option value="Mounting Structure" data-group="infra">Mounting Structure</option>
+                    <option value="Solar Street/Garden Light" data-group="appliance">
+                        Solar Light
+                    </option>
+
+                    <option value="Solar DC Fan" data-group="appliance">
+                        Solar Fan
+                    </option>
+
+                    <option value="Solar Water Pump" data-group="appliance">
+                        Solar Pump
+                    </option>
+
+                    <option value="Solar Water Heater" data-group="appliance">
+                        Solar Water Heater
+                    </option>
+                    <option value="Miscellaneous" data-group="other">Miscellaneous</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="inventoryTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr class="inventory-row" 
+                    data-utility="{{ p.utility_group }}" 
+                    data-category="{{ p.get_category_display }}" 
+                    data-brand="{{ p.brand|lower }}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            {% if p.image %}
+                                <img src="{{ p.image.url }}" width="40" height="40" class="rounded me-2 object-fit-cover border">
+                            {% endif %}
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <strong class="text-dark">{{ p.name }}</strong>
+                                </div>
+                                <small class="text-muted">{{ p.brand }} • {{ p.model_no|default:"No Model #" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-light text-secondary border px-2 py-1">{{ p.get_category_display }}</span></td>
+                    <td class="fw-semibold text-secondary">₹{{ p.price }}</td>
+                    <td>
+                        <div id="stock-display-{{ p.id }}" class="d-flex align-items-center stock-wrapper">
+                            <span class="me-2 fw-bold text-dark">{{ p.stock_quantity }}</span>
+                            <button class="btn btn-sm text-primary p-1 border-0 bg-transparent" onclick="toggleEdit('{{ p.id }}')" title="Edit Stock">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="stock-edit-{{ p.id }}" class="d-none">
+                            <form method="POST" action="{% url 'update_stock' p.id %}" class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <input type="number" name="stock_quantity" value="{{ p.stock_quantity }}" 
+                                    class="form-control form-control-sm me-1 shadow-none" style="width: 65px;" min="0">
+                                <button type="submit" class="btn btn-sm btn-success py-0 px-2">OK</button>
+                                <button type="button" class="btn btn-sm btn-link text-muted py-0 px-1" onclick="toggleEdit('{{ p.id }}')">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-inline-flex gap-1">
+                            <a href="{% url 'edit_product' p.id %}" class="btn btn-sm btn-light border text-primary" style="--bs-btn-hover-bg: #e9ecef;" title="View / Edit Product Details">
+                                <i class="bi bi-pencil-fill me-1"></i>Edit
+                            </a>
+                            <a href="{% url 'remove_product_admin' p.id %}" class="btn btn-sm btn-light border text-danger" style="--bs-btn-hover-bg: #ffeef0; --bs-btn-hover-border-color: #f5c2c7;" title="Delete Product" onclick="return confirm('Are you sure?')">
+                                <i class="bi bi-trash3-fill"></i>
+                            </a>
+                       
+                        <a href="{% url 'product_transactions' p.id %}" class="btn btn-sm btn-info text-white" title="View Buyers">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                         </div>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-ban me-2"></i>Reject Installation Request</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form action="{% url 'manage_installation_request_with_reason' %}" method="POST" id="rejectForm">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+
+                    <!-- Used when the save Changes button was not working -->
+                    <input type="hidden" name="status" value="rejected">
+                    
+                    <div id="rejection_display_section" class="mb-4 p-3 border rounded shadow-sm">
+                        <h6 class="text-danger small fw-bold text-uppercase mb-2" style="letter-spacing: 0.05em;">
+                            Current Rejection Reason:
+                        </h6>
+                        <p id="current_reason_text" class="mb-0 italic-reason"></p>
+                    </div>
+
+                    <input type="hidden" name="request_id" id="reject_request_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">Update or Add New Reason:</label>
+                        <textarea class="form-control" name="feedback" id="reject_reason_text" rows="4" 
+                                  placeholder="Provide details on why this request is being rejected..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger btn-sm px-4 rounded-pill shadow-sm">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="dateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Update Date</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="dateUpdateForm" method="POST" action="{% url 'update_date_ajax' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="request_id" id="modal_request_id">
+                    <input type="hidden" name="mode" id="modal_approve_mode" value="0">
+                    <div class="mb-3">
+                        <label class="form-label" id="modalDateLabel">Select Date</label>
+                        <input type="date" name="new_date" id="modal_date_input" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="assignModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Employee to Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'assign_work' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="request_id" id="assign_request_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Select Employee</label>
+                        <select name="employee_id" class="form-select" required>
+                            {% for e in active_staff %}
+                                <option value="{{ e.id }}">{{ e.full_name }} ({{ e.department }})</option>
+                            {% empty %}
+                                <option disabled>No active employees available</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Only approved/active employees appear here.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Work Type</label>
+                        <select name="work_type" id="assign_work_type" class="form-select">
+                            <option value="investigation">Site Investigation</option>
+                            <option value="installation">System Installation</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Schedule Date</label>
+                        <input type="date" name="scheduled_date"  id="assign_scheduled_date" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notes/Instructions</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">Confirm Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Installation Request Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="infoModalBody">
+                </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="amountModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <form id="amountForm" method="POST" action="{% url 'save_installation_amount' %}">
+        {% csrf_token %}
+
+        <div class="modal-header">
+          <h5 class="modal-title">Enter Installation Amount</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" name="request_id" id="amount_request_id">
+
+          <label class="form-label">Amount (₹)</label>
+          <input type="number" name="amount" class="form-control" required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+<!-- Timeline Modal -->
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-history me-2"></i>Project Timeline</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="timelineContent">
+                    <!-- Dates will be injected here by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="adminViewReportModal" tabindex="-1" aria-labelledby="adminViewReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="adminViewReportModalLabel"><i class="fas fa-clipboard-check text-success me-2"></i>Employee Field Report Output</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="row g-3">
+                    <div class="col-md-5 border-end border-2">
+                        <h6 class="text-secondary fw-bold text-uppercase small">Assigned Staff Data</h6>
+                        <p class="mb-1 text-dark" id="modal-staff-name" style="font-size: 1.1rem; font-weight: 600;"></p>
+                        <span class="badge bg-secondary mb-3" id="modal-task-type"></span>
+                        
+                        <h6 class="text-secondary fw-bold text-uppercase small pt-2">Report Content Summary</h6>
+                        <div class="p-3 bg-white rounded border italic text-muted" id="modal-report-text" style="font-size: 0.9rem; min-height: 120px; white-space: pre-wrap;"></div>
+                    </div>
+                    <div class="col-md-7 d-flex flex-column align-items-center justify-content-center bg-white rounded p-3" style="min-height:300px;">
+                        <h6 class="text-secondary fw-bold text-uppercase small w-100 mb-2 text-start">Field Proof Documentation</h6>
+                        <div id="media-proof-container" class="w-100 text-center flex-grow-1 d-flex align-items-center justify-content-center border rounded bg-light overflow-hidden">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div class="browser-popup" style="background: #111827; padding: 30px; border-radius: 16px; text-align: center; border: 1px solid #374151; max-width: 400px; width: 90%;">
+        <h3 class="text-white mb-3">Admin Logout</h3>
+        <p style="color: #9ca3af;">Are you sure you want to end the administrator session?</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button class="btn btn-outline-secondary" onclick="closeLogoutModal()" style="border-color: #4b5563;">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmLogout()">Yes, Logout</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Script to pass the Request ID to the modal
+    const assignModal = document.getElementById('assignModal');
+    assignModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        document.getElementById('assign_request_id').value = button.getAttribute('data-requestid');
+        
+        // Auto-select work type based on request status
+        const status = button.getAttribute('data-status');
+        if(status === 'approved') {
+            document.getElementById('assign_work_type').value = 'installation';
+        } else {
+            document.getElementById('assign_work_type').value = 'investigation';
+        }
+    });
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const assignDateInput = document.getElementById('assign_scheduled_date');
+    if (assignDateInput) {
+        assignDateInput.setAttribute('min', today);
+    }
+    const dateModal = document.getElementById('dateModal');
+    const rejectModal = document.getElementById('rejectModal');
+    const adminTabList = document.getElementById('adminTabList');
+
+    // --- TAB PERSISTENCE LOGIC ---
+    if (adminTabList) {
+        const activeTabTarget = localStorage.getItem('activeAdminTab');
+        if (activeTabTarget) {
+            // Use a slightly longer delay to ensure the DOM and Bootstrap are fully coupled
+            setTimeout(() => {
+                const targetButton = adminTabList.querySelector(`[data-bs-target="${activeTabTarget}"]`);
+                if (targetButton) {
+                    const tabTrigger = new bootstrap.Tab(targetButton);
+                    tabTrigger.show();
+                }
+            }, 150);
+        }
+
+        // Save tab selection
+        adminTabList.addEventListener('shown.bs.tab', (e) => {
+            localStorage.setItem('activeAdminTab', e.target.getAttribute('data-bs-target'));
+        });
+    }
+
+    // --- DATE MODAL LOGIC ---
+    if (dateModal) {
+        const dateInput = document.getElementById('modal_date_input');
+        if (dateInput) dateInput.setAttribute('min', today);
+
+        dateModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const mode = button.getAttribute('data-mode');
+            
+            document.getElementById('modal_request_id').value = button.getAttribute('data-requestid');
+            document.getElementById('modal_date_input').value = button.getAttribute('data-currentdate') || today;
+
+            const title = document.getElementById('modalTitle');
+            
+            const trigger = document.getElementById('modal_approve_mode');
+            if (mode === 'investigation') {
+                title.innerText = "Schedule Site Investigation";
+                trigger.value = "investigation";
+            } else if (mode === 'approve_with_date') {
+                title.innerText = "Set Installation Date & Approve";
+                trigger.value = "approve_with_date"; // This tells the backend to also change status
+            } else {
+                title.innerText = "Update Scheduled Date";
+                trigger.value = "reschedule";
+            }
+        });
+    }
+
+
+    // Add this inside your DOMContentLoaded block
+    const rejectForm = document.getElementById('rejectForm');
+    if (rejectForm) {
+        rejectForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // This stops the white screen from appearing
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+                    if (modalInstance) modalInstance.hide();
+                    
+                    // Refresh the page (Tab persistence will now keep you on the right tab)
+                    location.reload(); 
+                } else {
+                    alert("Error: " + (data.error || "Unknown error occurred"));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while saving.");
+            });
+        });
+    }
+    // --- REJECT MODAL LOGIC (Fixes "Reason Not Showing") ---
+    if (rejectModal) {
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; 
+            const requestId = button.getAttribute('data-requestid');
+            const feedback = button.getAttribute('data-feedback') || "";
+
+            // Use 'this' to ensure we find elements inside the active modal
+            const modalInputId = this.querySelector('#reject_request_id');
+            const modalTextArea = this.querySelector('#reject_reason_text');
+            const displayReason = this.querySelector('#current_reason_text');
+            const modalTitle = this.querySelector('.modal-title');
+
+            if (modalInputId) modalInputId.value = requestId;
+            if (modalTextArea) modalTextArea.value = feedback;
+
+            if (displayReason) {
+                displayReason.innerText = feedback.trim() !== "" ? feedback : "No reason provided yet.";
+                feedback.trim() !== "" ? displayReason.classList.remove('italic-reason') : displayReason.classList.add('italic-reason');
+            }
+
+            if (modalTitle) {
+                modalTitle.innerHTML = feedback.trim() !== "" 
+                    ? '<i class="fas fa-edit me-2"></i>Edit Rejection Reason' 
+                    : '<i class="fas fa-ban me-2"></i>Reject Installation Request';
+            }
+        });
+    }
+
+    // --- AJAX FORM SUBMISSION ---
+    const dateForm = document.getElementById('dateUpdateForm');
+    if (dateForm) {
+        dateForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(this.action, {
+                method: "POST",
+                body: new FormData(this),
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert("Error updating record.");
+            })
+            .catch(err => alert("Server error. Please try again."));
+        });
+    }
+});
+
+// Global function for the Info Modal
+function showInfo(name, size, panels, source, address, notes, photoUrl) {
+    const modalBody = document.getElementById('infoModalBody');
+    const photoHtml = photoUrl ? `<img src="${photoUrl}" class="img-fluid rounded shadow-sm mb-3">` : `<div class="p-4 bg-light text-center rounded mb-3">No site photos uploaded</div>`;
+    
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-5">${photoHtml}</div>
+            <div class="col-md-7">
+                <h6 class="text-uppercase text-muted small fw-bold">Client</h6>
+                <p class="mb-3">${name}</p>
+                <div class="row">
+                    <div class="col-6"><h6 class="text-uppercase text-muted small fw-bold">Size</h6><p>${size} kW</p></div>
+                    <div class="col-6"><h6 class="text-uppercase text-muted small fw-bold">Source</h6><p>${source}</p></div>
+                </div>
+                <h6 class="text-uppercase text-muted small fw-bold">Address</h6>
+                <p class="mb-3">${address}</p>
+                <h6 class="text-uppercase text-muted small fw-bold">Notes</h6>
+                <p class="bg-light p-2 rounded small">${notes || 'No notes provided.'}</p>
+            </div>
+        </div>`;
+    new bootstrap.Modal(document.getElementById('infoModal')).show();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // SET REQUEST ID IN MODAL
+   const amountModal = document.getElementById('amountModal');
+    if (amountModal) {
+        amountModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            
+            // Extract info from data-* attributes
+            const requestId = button.getAttribute('data-requestid');
+            const currentAmount = button.getAttribute('data-currentamount'); // New attribute
+            
+            const modalTitle = amountModal.querySelector('.modal-title');
+            const amountInput = amountModal.querySelector('input[name="amount"]');
+            
+            // Set Request ID
+            document.getElementById('amount_request_id').value = requestId;
+
+            // Change UI based on whether we are Editing or Entering
+            if (currentAmount && currentAmount !== 'None' && currentAmount !== '') {
+                modalTitle.textContent = "Edit Installation Amount";
+                amountInput.value = currentAmount;
+            } else {
+                modalTitle.textContent = "Enter Installation Amount";
+                amountInput.value = ""; // Clear for new entries
+            }
+        });
+    }
+
+    // AJAX FORM SUBMIT
+    const amountForm = document.getElementById('amountForm');
+
+    if (amountForm) {
+        amountForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            fetch(this.action, {
+                method: "POST",
+                body: new FormData(this),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(amountModal);
+                    modal.hide();
+                    location.reload();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(() => alert("Something went wrong"));
+        });
+    }
+
+});
+
+function showTimeline(client, investigation, installation, amount, payment) {
+    const content = `
+        <div class="mb-3"><strong>Client:</strong> ${client}</div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-search-location me-2 text-primary"></i>Investigation Date:</span>
+                <span class="fw-bold">${investigation || 'N/A'}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tools me-2 text-warning"></i>Installation Date:</span>
+                <span class="fw-bold">${installation || 'N/A'}</span>
+            </li>
+             <li class="list-group-item d-flex justify-content-between">
+                <span>Amount Paid:</span>
+                <span class="fw-bold text-success">
+                    ${amount ? '₹' + amount : 'N/A'}
+                </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-receipt me-2 text-success"></i>Payment Completed:</span>
+                <span class="fw-bold">${payment || 'N/A'}</span>
+            </li>
+        </ul>
+    `;
+    document.getElementById('timelineContent').innerHTML = content;
+    new bootstrap.Modal(document.getElementById('timelineModal')).show();
+}
+
+// products section
+
+function toggleEdit(productId) {
+    const displayDiv = document.getElementById(`stock-display-${productId}`);
+    const editDiv = document.getElementById(`stock-edit-${productId}`);
+    
+    if (displayDiv.classList.contains('d-none')) {
+        displayDiv.classList.remove('d-none');
+        displayDiv.classList.add('d-flex');
+        editDiv.classList.add('d-none');
+    } else {
+        displayDiv.classList.remove('d-flex');
+        displayDiv.classList.add('d-none');
+        editDiv.classList.remove('d-none');
+    }
+}
+
+
+</script>
+
+<script>
+function viewProofReport(employeeName, workType, reportText, fileUrl) {
+    document.getElementById('modal-staff-name').innerText = employeeName;
+    document.getElementById('modal-task-type').innerText = workType;
+    document.getElementById('modal-report-text').innerText = reportText || "No explicit performance statement filed.";
+    
+    const mediaContainer = document.getElementById('media-proof-container');
+    mediaContainer.innerHTML = ''; // Wipe history state
+    
+    if (fileUrl) {
+        const extension = fileUrl.split('.').pop().toLowerCase();
+        
+        if (['mp4', 'mkv', 'mov'].includes(extension)) {
+            // Render a real-time tracking video interface component
+            mediaContainer.innerHTML = `
+                <video controls class="img-fluid rounded w-100" style="max-height: 350px;">
+                    <source src="${fileUrl}" type="video/mp4">
+                    Your web client does not support HTML5 layout playback components.
+                </video>`;
+        } else {
+            // Standard crisp image snapshot asset parsing frame
+            mediaContainer.innerHTML = `
+                <a href="${fileUrl}" target="_blank" title="Click to view full asset resolution">
+                    <img src="${fileUrl}" class="img-fluid rounded shadow-sm" style="max-height: 350px; object-fit: contain;" />
+                </a>`;
+        }
+    } else {
+        mediaContainer.innerHTML = '<span class="text-muted small italic">Missing media file attachment framework error.</span>';
+    }
+    
+    var reportModal = new bootstrap.Modal(document.getElementById('adminViewReportModal'));
+    reportModal.show();
+}
+
+
+function filterInventoryTable() {
+    const brandInput = document.getElementById('filterBrand').value.toLowerCase();
+    const selectedGroup = document.getElementById('filterUtilityGroup').value;
+    const selectedCat = document.getElementById('filterCategory').value;
+    
+    const rows = document.querySelectorAll('.inventory-row');
+    const catSelect = document.getElementById('filterCategory');
+    
+    // Step 1: Intelligently hide/show Category options based on selected Utility Group
+    Array.from(catSelect.options).forEach(option => {
+        const optionGroup = option.getAttribute('data-group');
+        if (!selectedGroup || !optionGroup || optionGroup === selectedGroup) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+
+    // Reset specific category selection if it doesn't fit a newly toggled utility group
+    const activeOption = catSelect.options[catSelect.selectedIndex];
+    if (activeOption && activeOption.getAttribute('data-group') && selectedGroup && activeOption.getAttribute('data-group') !== selectedGroup) {
+        catSelect.value = "";
+    }
+
+    // Step 2: Loop table rows and check conditions
+    rows.forEach(row => {
+        const rowGroup = row.getAttribute('data-utility');
+        const rowCat = (row.getAttribute('data-category') || '').toLowerCase();
+        const rowBrand = row.getAttribute('data-brand');
+
+        const matchBrand = rowBrand.includes(brandInput);
+        const matchGroup = !selectedGroup || rowGroup === selectedGroup;
+        const matchCat = !selectedCat || rowCat === selectedCat.toLowerCase();
+
+        if (matchBrand && matchGroup && matchCat) {
+            row.style.setProperty('display', '', 'important');
+        } else {
+            row.style.setProperty('display', 'none', 'important');
+        }
+});
+}
+
+
+// Click handler to populate Employee Detail Modals dynamically
+const employeeButtons = document.querySelectorAll('.btn-view-employee');
+employeeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        document.getElementById('emp-modal-photo').src = this.getAttribute('data-photo');
+        document.getElementById('emp-modal-name').textContent = this.getAttribute('data-name');
+        document.getElementById('emp-modal-designation').textContent = this.getAttribute('data-designation');
+        document.getElementById('emp-modal-id').textContent = '#' + this.getAttribute('data-id');
+        document.getElementById('emp-modal-dept').textContent = this.getAttribute('data-dept');
+        document.getElementById('emp-modal-email').textContent = this.getAttribute('data-email');
+        document.getElementById('emp-modal-phone').textContent = this.getAttribute('data-phone');
+        document.getElementById('emp-modal-address').textContent = this.getAttribute('data-address');
+        document.getElementById('emp-modal-joined').textContent = this.getAttribute('data-joined');
+    });
+});
+
+</script>
+
+<script>
+    const logoutTrigger = document.getElementById('logoutTrigger');
+    const logoutModal = document.getElementById('logoutModal');
+
+    // Show modal on click
+    logoutTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        logoutModal.style.display = 'flex';
+    });
+
+    // Close modal
+    function closeLogoutModal() {
+        logoutModal.style.display = 'none';
+    }
+
+    // Perform logout
+    function confirmLogout() {
+        window.location.href = "{% url 'logout' %}";
+    }
+</script>
+
+</body>
+</html>

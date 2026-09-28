@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 30px; }
+    body { font-family: 'Helvetica', sans-serif; font-size: 12px; color: #1e293b; line-height: 1.4; }
+    
+    .header { border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
+    .company-title { font-size: 24px; font-weight: bold; color: #0f172a; }
+    .meta-info { color: #64748b; font-size: 11px; }
+    
+    .section-title { background: #f1f5f9; padding: 6px 10px; font-size: 13px; font-weight: bold; color: #0f766e; border-left: 4px solid #0f766e; margin: 15px 0 8px 0; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; }
+    .text-right { text-align: right; font-weight: bold; }
+    
+    .summary-box { background: #0f766e; color: white; padding: 10px; text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; }
+    
+    .roi-grid { width: 100%; margin-top: 10px; }
+    .roi-card { border: 1px solid #e2e8f0; padding: 8px; text-align: center; border-radius: 4px; }
+    .roi-label { font-size: 10px; color: #64748b; text-transform: uppercase; }
+    .roi-val { font-size: 13px; font-weight: bold; color: #0f172a; }
+</style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-title">{{ company_name }}</div>
+        <div class="meta-info">Date: {{ generation_date }} | Customer: {{ customer_name }}</div>
+        <div class="meta-info">Building: {{ building_type }} | System: {{ tech_data.system_size }} kW {{ tech_data.get_system_display_name }}</div>
+    </div>
+
+    <div class="section-title">Hardware & Cost Breakdown</div>
+    <table>
+        <tr><td>Solar Panels ({{ tech_data.panels_needed }})</td><td class="text-right">INR {{ panel_cost }}</td></tr>
+        <tr><td>Inverter</td><td class="text-right">INR {{ inverter_cost }}</td></tr>
+        <tr><td>Mounting Structure</td><td class="text-right">INR {{ structure_cost }}</td></tr>
+        <tr><td>Protection System</td><td class="text-right">INR {{ protection_cost }}</td></tr>
+        {% if tech_data.battery_cost > 0 %}<tr><td>Battery Storage</td><td class="text-right">INR {{ battery_cost }}</td></tr>{% endif %}
+        <tr><td>Installation & Labor</td><td class="text-right">INR {{ installation_fee }}</td></tr>
+        <tr><td>GST / Taxes</td><td class="text-right">INR {{ tax }}</td></tr>
+    </table>
+    <div class="summary-box">Net Investment: INR {{ total_price }}</div>
+
+    <div class="section-title">ROI & Performance Forecast</div>
+    <table class="roi-grid">
+        <tr>
+            <td><div class="roi-card"><div class="roi-label">Year 1 Savings</div><div class="roi-val">INR {{ annual_savings }}</div></div></td>
+            <td><div class="roi-card"><div class="roi-label">Monthly Reduction</div><div class="roi-val">INR {{ monthly_savings }}</div></div></td>
+            <td><div class="roi-card"><div class="roi-label">Payback Period</div><div class="roi-val">{{ payback_years }} Years</div></div></td>
+        </tr>
+        <tr>
+            <td><div class="roi-card"><div class="roi-label">Annual Generation</div><div class="roi-val">{{ annual_generation }} Units</div></div></td>
+            <td><div class="roi-card"><div class="roi-label">Daily Generation</div><div class="roi-val">{{ daily_generation }} Units</div></div></td>
+            <td><div class="roi-card"><div class="roi-label">Lifetime Profit</div><div class="roi-val">INR {{ lifetime_savings }}</div></div></td>
+        </tr>
+    </table>
+
+    <div class="section-title">Dynamic Forecasting Parameters</div>
+    <table>
+        <tr>
+            <td>Panel Degradation: <strong>0.7% annual</strong></td>
+            <td>Tariff Inflation: <strong>3% annual</strong></td>
+        </tr>
+        <tr>
+            <td>Maintenance: <strong>{{ maintenance_factor }}% lifecycle</strong></td>
+            <td>Performance Ratio: <strong>{{ performance_ratio }}%</strong></td>
+        </tr>
+    </table>
+</body>
+</html>

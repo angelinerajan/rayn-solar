@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart AI Assistant 🤖</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+  /* REBALANCED THEME: Midnight Blue dominant, Burgundy only for deep-shadow warmth */
+  --bg-primary: #141824;      /* Main background */
+  --bg-deep-accent: #250204;  /* Deep burgundy for the bottom gradient only */
+  
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6e8ee;
+  --muted: #9aa0b4;
+  --accent: #8b5cf6;
+  --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+}
+  body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    /* Rebalanced gradient: Primarily midnight blue, subtle burgundy shadow at bottom */
+    background: 
+      radial-gradient(circle at top, #1e253a, transparent 60%),
+      linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-primary) 60%, var(--bg-deep-accent) 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.4s ease, color 0.4s ease;
+    min-height: 100vh;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  #chatbot-container {
+    width: 90%;
+    max-width: 850px;
+    height: 85vh;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #chatbot-header {
+    padding: 24px 30px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #chatbot-messages {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .message {
+    max-width: 75%;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+  }
+
+  .message.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message.bot {
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-input-container {
+    padding: 20px 30px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-input {
+    flex: 1;
+    background: #0f0505;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .action-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .send-btn { background: var(--accent); border: none; color: white; }
+  .action-btn:hover { border-color: var(--accent); }
+
+  #close-chatbot { color: var(--muted); cursor: pointer; }
+  #close-chatbot:hover { color: #f87171; }
+</style>
+
+<div id="chatbot-container">
+  <div id="chatbot-header">
+    <div>
+      <h5>Ray</h5>
+      <small style="color: #94a3b8;">Active & Ready</small>
+    </div>
+    <div id="close-chatbot">&times;</div>
+  </div>
+
+  <div id="chatbot-messages">
+    <div class="message bot">Hello, I am Ray. How may I assist you today?</div>
+    <div id="typing-indicator" class="typing">AI is processing...</div>
+  </div>
+
+  <div class="chat-input-container">
+    <button id="speech-chat" class="action-btn speech-btn" title="Voice Input">🎤</button>
+    <input id="chat-input" class="chat-input" type="text" placeholder="Send a command..." autocomplete="off" />
+    <button id="stop-speech" class="action-btn stop-btn" title="Interrupt Voice">⏹</button>
+    <button id="send-chat" class="action-btn send-btn">➤</button>
+  </div>
+</div>
+
+<script>
+  const closeButton = document.getElementById('close-chatbot');
+  const sendButton = document.getElementById('send-chat');
+  const speechButton = document.getElementById('speech-chat');
+  const stopButton = document.getElementById('stop-speech');
+  const chatInput = document.getElementById('chat-input');
+  const chatbotMessages = document.getElementById('chatbot-messages');
+  const typingIndicator = document.getElementById('typing-indicator');
+
+  let synth = window.speechSynthesis;
+
+  closeButton.addEventListener('click', () => {
+      window.location.href = '/user_home/';
+  });
+
+  function sendMessage() {
+    const userMessage = chatInput.value.trim();
+    if(!userMessage) return;
+
+    displayMessage(userMessage, 'user');
+    chatInput.value = '';
+
+    typingIndicator.style.display = 'block';
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+    fetch('/chatbot/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ message: userMessage })
+    })
+    .then(res => res.json())
+    .then(data => {
+      typingIndicator.style.display = 'none';
+      displayMessage(data.response, 'bot');
+      speakText(data.response);
+    })
+    .catch(err => {
+      typingIndicator.style.display = 'none';
+      displayMessage('Error: Unable to get response', 'bot');
+    });
+  }
+
+  function displayMessage(message, sender){
+    // This replaces all occurrences of * and # with nothing for a clean UI
+    const cleanMessage = message.replace(/[*#]/g, '');
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.textContent = cleanMessage;
+
+    chatbotMessages.insertBefore(msgDiv, typingIndicator);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  }
+
+  function speakText(text) {
+    if (synth.speaking) synth.cancel();
+
+    // 1. Remove all common Markdown/Special symbols (*, #, _, ~, `)
+    // The [ *#_~` ] bracket targets any of these individual characters
+    let cleanText = text.replace(/[*#_~`]/g, '');
+
+    // 2. Remove Emojis and special Unicode symbols
+    cleanText = cleanText.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+
+    // 3. Optional: Trim extra whitespace left behind by removals
+    cleanText = cleanText.replace(/\s+/g, ' ').trim();
+
+    if (cleanText.length > 0) {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'en-US';
+        synth.speak(utterance);
+    }
+  }
+
+  sendButton.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  speechButton.addEventListener('click', () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRecognition){
+      alert('Speech Recognition not supported.');
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.start();
+    recognition.onresult = (event) => {
+      chatInput.value = event.results[0][0].transcript;
+      sendMessage();
+    }
+  });
+
+  stopButton.addEventListener('click', () => {
+    if(synth.speaking) synth.cancel();
+  });
+</script>
+</body>
+</html>

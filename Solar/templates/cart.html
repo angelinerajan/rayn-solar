@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart | Rayn Solar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      /* MATCHED TO RAYN SOLAR SIGNATURE TONALITY */
+      --bg1: #300305;       /* Deep luxurious burgundy */
+      --bg2: #141824;       /* Twilight midnight blue */
+      --bg-mid: #0f111a;    /* Deep slate tone */
+      --card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6e8ee; 
+      --muted: #9aa0b4; 
+      --accent: #8b5cf6;     /* Vibrant purple signature accent */
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      --danger: #f87171;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      /* Smooth mixed dark multi-gradient matching user home */
+      background: 
+        radial-gradient(circle at top, var(--bg2), transparent 55%),
+        linear-gradient(to bottom, var(--bg2) 0%, var(--bg1) 20%, var(--bg-mid) 45%, var(--bg-mid) 100%);
+      background-attachment: scroll;
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cart-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Breadcrumb Container Alignment with Order Tracking Actions */
+    .breadcrumb-wrapper {
+      width: 100%;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .breadcrumb a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .breadcrumb a.home-link { color: var(--accent); }
+    .breadcrumb a:hover { color: #fff; transform: translateY(-1px); }
+    .breadcrumb a.home-link:hover { filter: brightness(1.2); color: var(--accent); }
+    .breadcrumb i.fa-chevron-right { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); }
+    .breadcrumb span.current-page { color: var(--muted); font-size: 0.9rem; opacity: 0.7; }
+
+    /* Track Orders Anchor Layout Button */
+    .orders-history-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .orders-history-link i {
+      color: var(--accent);
+      font-size: 0.95rem;
+    }
+
+    .orders-history-link:hover {
+      background: var(--accent-gradient);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    }
+
+    .orders-history-link:hover i {
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .cart-item {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.3s;
+    }
+
+    .cart-item:hover {
+      border-color: rgba(139, 92, 246, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .cart-left { display: flex; gap: 20px; align-items: center; }
+
+    .cart-item img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .cart-details h3 {
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .price {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin: 5px 0;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .quantity-controls button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quantity-controls button:hover {
+      background: var(--accent-gradient);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .quantity-controls span {
+      font-size: 1rem;
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .cart-right { text-align: right; }
+
+    .total-price {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .remove-btn {
+      color: var(--danger);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: 0.2s;
+      opacity: 0.8;
+    }
+
+    .remove-btn:hover { opacity: 1; text-decoration: underline; }
+
+    .address-section {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 24px;
+      border-radius: 20px;
+      margin-top: 25px;
+      border: 1px solid var(--border);
+    }
+
+    .address-section h3 {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .address-section h3 i { color: var(--accent); }
+
+    .checkout-card {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      padding: 30px;
+      border-radius: 24px;
+      text-align: center;
+      margin-top: 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .checkout-card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 5px; }
+    .checkout-card h2 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+
+    .checkout-card .btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      background: var(--accent-gradient);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .checkout-card .btn:hover:not([disabled]) {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3);
+    }
+
+    .add-address-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      background: var(--accent-gradient);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .add-address-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .empty-cart { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 1.1rem; }
+
+    /* Custom Modern Modal Custom Stylesheet Overlay */
+    .custom-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 12, 18, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .custom-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-modal {
+      background: linear-gradient(135deg, #1e1b29, #12101a);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 24px;
+      padding: 30px;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .custom-modal-overlay.active .custom-modal {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 60px; height: 60px;
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin: 0 auto 20px;
+    }
+
+    .custom-modal h4 { font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
+    .custom-modal p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; }
+
+    .modal-actions {
+      display: flex; gap: 12px; justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.95rem;
+      cursor: pointer; border: none; transition: 0.2s; min-width: 110px;
+    }
+
+    .modal-btn.confirm {
+      background: var(--accent-gradient); color: #fff;
+    }
+    .modal-btn.confirm:hover { filter: brightness(1.1); }
+
+    .modal-btn.cancel {
+      background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);
+    }
+    .modal-btn.cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  </style>
+</head>
+
+<body>
+
+<div class="cart-container">
+  
+  <div class="breadcrumb-wrapper">
+    <nav class="breadcrumb">
+      <a href="/user_home/" class="home-link"><i class="fas fa-home"></i> Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'product_marketplace' %}">Rayn Inventory</a>
+      <i class="fas fa-chevron-right"></i>
+      <span class="current-page">Your Cart</span>
+    </nav>
+    
+    <a href="{% url 'product_orders' %}" class="orders-history-link">
+      <i class="fas fa-box-open"></i> Track My Orders
+    </a>
+  </div>
+
+  <h1>Your Shopping Cart</h1>
+
+  {% for item in cart_items %}
+  <div class="cart-item">
+    <div class="cart-left">
+      {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+      {% else %}
+        <div style="width: 90px; height: 90px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+          <i class="fas fa-solar-panel fa-2x" style="color: var(--border);"></i>
+        </div>
+      {% endif %}
+
+      <div class="cart-details">
+        <h3>{{ item.product.name }}</h3>
+        <p class="price">₹{{ item.price }} each</p>
+
+        <div class="quantity-controls">
+          <a href="{% url 'decrease_quantity' item.id %}" style="text-decoration: none;"><button>-</button></a>
+          <span>{{ item.quantity }}</span>
+          <a href="{% url 'increase_quantity' item.id %}" style="text-decoration: none;"><button>+</button></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-right">
+      <p class="total-price">₹{{ item.total_price }}</p>
+      <a href="{% url 'remove_from_cart' item.id %}" class="remove-btn">
+        <i class="fas fa-trash-alt"></i> Remove
+      </a>
+    </div>
+  </div>
+  {% empty %}
+    <div class="empty-cart">
+      <i class="fas fa-shopping-basket fa-3x" style="color: var(--border); margin-bottom: 15px; display: block;"></i>
+      <p>Your cart is empty.</p>
+    </div>
+  {% endfor %}
+
+  <div class="address-section">
+    <h3><i class="fas fa-truck"></i> Shipping Address</h3>
+    {% if address %}
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 8px;">Shipping to:</p>
+        <p style="line-height: 1.5;"><strong>{{ address.full_name }}</strong><br>
+        {{ address.address_line }}, {{ address.city }} - {{ address.pincode }}</p>
+        <div style="margin-top: 12px;">
+          <a href="{% url 'add_address' %}" style="color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 500;">
+              <i class="fas fa-edit"></i> Edit Address
+          </a>
+        </div>
+    {% else %}
+        <p style="color: var(--danger); font-size: 0.95rem; margin-bottom: 10px;">No shipping address found configuration.</p>
+        <a href="{% url 'add_address' %}" class="add-address-btn"><i class="fas fa-plus"></i> Add Shipping Address</a>
+    {% endif %}
+  </div>
+
+  {% if cart_items %}
+  <div class="checkout-card">
+      <p>Total Amount</p>
+      <h2>₹{{ total }}</h2>
+
+      {% if address %}
+          <a href="/checkout/" id="checkoutTrigger" style="text-decoration: none;">
+              <button class="btn" type="button">Proceed to Checkout</button>
+          </a>
+      {% else %}
+          <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed;" disabled title="Please add an address first">
+              Add Address to Enable Checkout
+          </button>
+      {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+
+<div class="custom-modal-overlay" id="checkoutModalOverlay">
+  <div class="custom-modal">
+    <div class="modal-icon">
+      <i class="fas fa-shipping-fast"></i>
+    </div>
+    <h4>Confirm Order Shipment</h4>
+    <p>Your order will be safely packaged and shipped directly to: <br><strong style="color: #fff; display: inline-block; margin-top: 5px;">{{ address.city }}</strong>. <br><br>Do you wish to proceed to checkout?</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="closeModalBtn">Cancel</button>
+      <button class="modal-btn confirm" id="confirmModalBtn">Proceed</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkoutTrigger = document.getElementById('checkoutTrigger');
+    const modalOverlay = document.getElementById('checkoutModalOverlay');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const confirmModalBtn = document.getElementById('confirmModalBtn');
+
+    if (checkoutTrigger) {
+      checkoutTrigger.addEventListener('click', function(e) {
+        e.preventDefault(); 
+        modalOverlay.classList.add('active'); 
+      });
+    }
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', function() {
+        modalOverlay.classList.remove('active');
+      });
+    }
+
+    if (confirmModalBtn && checkoutTrigger) {
+      confirmModalBtn.addEventListener('click', function() {
+        window.location.href = checkoutTrigger.getAttribute('href'); 
+      });
+    }
+
+    modalOverlay.addEventListener('click', function(e) {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

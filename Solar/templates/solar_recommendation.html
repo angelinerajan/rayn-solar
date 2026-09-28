@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RaynSolar | Solar System Recommendation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      /* UNIFIED RAYN SOLAR PORTAL PALETTE */
+      --bg1: #300305;       /* Deep luxurious burgundy */
+      --bg2: #141824;       /* Twilight midnight blue */
+      --bg-mid: #0f111a;    /* Deep slate base */
+      --card: rgba(255, 255, 255, 0.04);
+      --card-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6e8ee;      /* Clean crisp text */
+      --muted: #9aa0b4;     /* Soft slate grey */
+      --accent: #8b5cf6;    /* Vibrant purple signature accent */
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 40px 20px;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      /* Seamless multi-layer linear-to-radial system match */
+       background: 
+        radial-gradient(circle at top, #2d1b33, #120e14 60%),
+        linear-gradient(to bottom, #120e14 0%, #1c131d 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Changed from center to flex-start to lift the card higher up on the screen */
+      justify-content: flex-start; 
+      overflow-x: hidden;
+    }
+
+    /* AMBIENT MOUSE TRACKING FIELD OVERLAY */
+    #glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      background: radial-gradient(800px circle at var(--x) var(--y), rgba(139, 92, 246, 0.03), transparent 80%);
+      z-index: 1;
+    }
+
+    /* Polished Breadcrumbs Alignment with integrated Back Option */
+    .breadcrumb-wrapper {
+      width: 100%;
+      /* Expanded to cleanly line up with the new 1050px container footprint */
+      max-width: 1050px; 
+      margin-top: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .breadcrumb a {
+      color: var(--text);
+      text-decoration: none;
+      transition: 0.25s ease;
+    }
+
+    .breadcrumb a:hover { 
+      color: var(--accent); 
+    }
+
+    /* Expanded & Elevated Premium Glassmorphic Container */
+    .container {
+      width: 100%;
+      /* Increased sizing footprint from 950px to 1050px */
+      max-width: 1050px; 
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5),
+                  0 0 40px rgba(139, 92, 246, 0.03);
+      padding: 45px 50px; /* Enhanced interior cell spacing */
+      position: relative;
+      z-index: 2;
+      margin-bottom: 60px;
+    }
+
+    /* Header text styling block */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .header h1 span {
+      background: linear-gradient(135deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .header p {
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    /* High Highlight Recommendation Showcase Panel */
+    .recommend-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 35px;
+      margin-bottom: 40px;
+      text-align: center;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .recommend-box h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .recommend-box span {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* Comparison Grid Info Cards Layout */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 26px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: var(--card-hover);
+      transform: translateY(-4px);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Selection Control elements custom formatting blocks */
+    .select-box {
+      margin-top: 45px;
+      text-align: center;
+    }
+
+    select {
+      padding: 14px 24px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+      min-width: 220px;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.02);
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+    }
+
+    select option {
+      background-color: var(--bg-mid);
+      color: var(--text);
+      padding: 12px;
+    }
+
+    /* Buttons Actions Layout Panel Configuration */
+    .actions {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* Sophisticated Low Intensity Interactive Buttons Configuration */
+    .btn {
+      padding: 15px 40px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      transition: all 0.35s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      filter: brightness(0.9);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 12px 25px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    /* Explanatory Overlay Modal Sheet Module overlay components */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 12, 18, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: var(--bg-mid);
+      border: 1px solid var(--border);
+      padding: 35px;
+      border-radius: 24px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    }
+
+    .modal-box h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-box p {
+      font-size: .95rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .modal-box b {
+      color: #ffffff;
+    }
+
+    .modal-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .modal-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .modal-box::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 30px 20px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="glow"></div>
+
+  <div class="breadcrumb-wrapper">
+    <div class="breadcrumb">
+      <a href="/user_home/"><i class="fas fa-home"></i> Home</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+      <a href="{% url 'services' %}">Services</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+      <a href="{% url 'solar_estimation_edit' estimation.id %}">Edit Form Inputs</a>
+      <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+      <span>System Recommendation</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="header">
+      <h1>Recommended Solar <span>System</span></h1>
+      <p>Based on your electricity usage, roof area & power availability</p>
+    </div>
+
+    <div class="recommend-box">
+      <h2 id="recommendedSystem">{{ recommended_system }}</h2>
+      <span id="reasonText">{{ reason }}</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>On-Grid</h3>
+        <p>Lowest cost. No batteries. Best for areas with stable electricity setups.</p>
+      </div>
+
+      <div class="card">
+        <h3>Hybrid</h3>
+        <p>Grid + Battery backup. Smart energy automated management. Balanced pricing layout structure.</p>
+      </div>
+
+      <div class="card">
+        <h3>Off-Grid</h3>
+        <p>Complete independence from grid pipelines. Higher hardware production cost due to heavy battery architecture infrastructure.</p>
+      </div>
+    </div>
+
+    <form method="POST" action="{% url 'solar_system_size' estimation.id %}">
+      {% csrf_token %}
+
+      <div class="select-box">
+        <label style="display:block; margin-bottom:10px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted);">
+          Change system manually
+        </label>
+
+        <select name="system" id="systemSelect">
+          <option value="ongrid" {% if tech_record.system == "ongrid" or recommended_system == "On-Grid System" %}selected{% endif %}>On-Grid</option>
+          <option value="hybrid" {% if tech_record.system == "hybrid" or recommended_system == "Hybrid System" %}selected{% endif %}>Hybrid</option>
+          <option value="offgrid" {% if tech_record.system == "offgrid" or recommended_system == "Off-Grid System" %}selected{% endif %}>Off-Grid</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn secondary" onclick="openModal()">
+          Know Differences
+        </button>
+
+        <button type="submit" class="btn">
+          Continue
+        </button>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="modal" id="infoModal">
+    <div class="modal-box">
+      <h2>Solar System Types Explained – Simple Guide</h2>
+
+      <p>
+        A solar power system converts sunlight into electricity using solar panels.
+        The way this electricity is stored and used depends on the type of system you choose.
+        Let’s understand each type in simple terms.
+      </p>
+
+      <br>
+
+      <p><b>1) On-Grid Solar System (Connected to Electricity Board)</b></p>
+      <p>
+        This system is directly connected to the government electricity grid.
+        Solar power is used first, and extra power is sent to the grid.
+      </p>
+      <p>
+        ⚡ <b>During daytime:</b> Your home uses solar power. Extra power goes to the grid.<br>
+        🌙 <b>At night:</b> Power is taken from the grid.<br>
+        ❌ <b>During power cuts:</b> System shuts down for safety — NO backup channels.
+      </p>
+      <p>
+        ✔ Cheapest system configuration setup<br>
+        ✔ Lowest manual regular maintenance dependencies<br>
+        ✔ Best for urban cities with reliable grid network utility pipelines
+      </p>
+
+      <br>
+
+      <p><b>2) Hybrid Solar System (Grid + Battery Backup)</b></p>
+      <p>
+        This system combines solar panels, storage modules, and public utility layouts.
+        It intelligently routes priority configurations automatically across lines to deliver structural cost savings.
+      </p>
+      <p>
+        ⚡ <b>Daytime:</b> Uses solar resource reserves + handles battery charging routines.<br>
+        🌙 <b>Night:</b> Seamlessly requests grid support or storage arrays autonomously.<br>
+        ✅ <b>During power cuts:</b> Battery configurations maintain emergency backup functionality.
+      </p>
+      <p>
+        ✔ Emergency power supply infrastructure safeguards<br>
+        ✔ Intelligent automated logic load balancing lines switcher<br>
+        ✔ Optimally balanced value-cost to long term usability returns<br>
+        ✔ Most common household consumer hardware ecosystem choice
+      </p>
+
+      <br>
+
+      <p><b>3) Off-Grid Solar System (Fully Independent System)</b></p>
+      <p>
+        This framework handles electricity isolation outside public operations structures entirely.
+        All generation assets manage delivery directly into isolated battery arrays.
+      </p>
+      <p>
+        ⚡ <b>Daytime:</b> Direct generation covers home consumption load lines + fills local arrays.<br>
+        🌙 <b>Night:</b> Energy reserves dispatch performance directly to output connections.<br>
+        ✅ <b>During power cuts:</b> Complete immunity from line disruptions — fully self-sufficient operations model.
+      </p>
+      <p>
+        ✔ Performs everywhere out-of-box with zero connection requirements<br>
+        ✔ Excellent layout fitment choice for rural infrastructure installations<br>
+        ❌ Significant component costs associated with deep storage units allocation<br>
+        ❌ Storage cell lifecycle replacements are required over prolonged utilization spans
+      </p>
+
+      <br>
+
+      <p><b>Quick Recommendation Guide:</b></p>
+      <p>
+        🏙 City + stable electricity → <b>On-Grid</b><br>
+        🏡 Home + power cuts → <b>Hybrid</b><br>
+        🌾 Remote / no grid → <b>Off-Grid</b>
+      </p>
+
+      <br>
+
+      <button class="btn" style="width: 100%; margin-top: 10px;" onclick="closeModal()">Got it!</button>
+    </div>
+  </div>
+
+  <script>
+    // Rayn Solar tracking mouse execution engine standard overlay logic mapping
+    document.addEventListener('mousemove', (e) => {
+        document.documentElement.style.setProperty('--x', e.clientX + 'px');
+        document.documentElement.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    const select = document.getElementById("systemSelect");
+    const title = document.getElementById("recommendedSystem");
+    const reason = document.getElementById("reasonText");
+
+    // FIXED: Dictionary keys now match the exact lowercase option values from your HTML select element
+    const map = {
+      "ongrid": ["On-Grid System", "Lowest cost & best savings if grid is stable."],
+      "hybrid": ["Hybrid System", "Balanced solution with battery backup."],
+      "offgrid": ["Off-Grid System", "Complete power independence with backup."]
+    };
+
+    function updateDisplay(value) {
+        if (map[value]) {
+            title.innerText = map[value][0];
+            reason.innerText = map[value][1];
+        }
+    }
+
+    // Dynamic state listener updates header section immediately on change
+    select.addEventListener("change", () => {
+        updateDisplay(select.value);
+    });
+
+    function openModal() {
+        document.getElementById("infoModal").style.display = "flex";
+    }
+    
+    function closeModal() {
+        document.getElementById("infoModal").style.display = "none";
+    }
+
+    // Ensures correct initial view parsing regardless of recommended or backend record states
+    window.onload = () => {
+        updateDisplay(select.value);
+    };
+  </script>
+
+</body>
+</html>
