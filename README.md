@@ -57,10 +57,10 @@ The following screenshots provide an overview of the major features and
 workflows implemented in the Rayn Solar system.
 
 ### Home Page
-![Rayn Solar Home Page](screenshots/1.JPG)
+![Rayn Solar Home Page](screenshots/01.JPG)
 
 ### Solar Cost Estimation
-![Solar Cost Estimation](screenshots/9.JPG)
+![Solar Cost Estimation](screenshots/09.JPG)
 
 ### Solar System Recommendation
 ![Recommended Solar System](screenshots/11.JPG)
