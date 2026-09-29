@@ -51,6 +51,44 @@ The platform also integrates **"Ray," an AI-powered chatbot** that provides tech
 - **Backend:** Python, Django
 - **Database:** SQLite3
 
+## Screenshots
+
+The following screenshots provide an overview of the major features and
+workflows implemented in the Rayn Solar system.
+
+### Home Page
+![Rayn Solar Home Page](screenshots/1.JPG)
+
+### Solar Cost Estimation
+![Solar Cost Estimation](screenshots/9.JPG)
+
+### Solar System Recommendation
+![Recommended Solar System](screenshots/11.JPG)
+
+### Solar System Project Quotation
+![Project Quotation](screenshots/12.JPG)
+
+### Solar Product Marketplace
+![Rayn Solar Inventory](screenshots/60.JPG)
+
+### Solar Product Management
+![Inventory Management](screenshots/57.JPG)
+
+### Installation Request Management
+![Installation Request Management](screenshots/43.JPG)
+
+### Employee Field Report
+![Employee Field Report](screenshots/46.JPG)
+
+### Payment
+![Payment](screenshots/51.JPG)
+
+### AI-Powered Support — Ray
+![Ray AI Chatbot](screenshots/55.JPG)
+
+The complete step-by-step project documentation is available in the
+`screenshots/` directory.
+
 ## Project Structure
 
 ```text
